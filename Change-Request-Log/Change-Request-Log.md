@@ -121,6 +121,16 @@ Total | 310
 
 __Recording Time Included__
 
+## Reverse engineering
+
+### Class Diagram
+
+![](class-diagram.png)
+
+### Sequence Diagram
+
+![](sequence-diagram.png)
+
 ## Conclusions
 
 For this change, concept location took us a lot time. I think it's not bad spending more time in any phase, but I think we should delay doing some stuff to the second phase. For example, we don't have to dig very deep in the concept location phase, since we will do such thing more comprehensive in the impact analysis phase (estimate impact set).  
