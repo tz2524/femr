@@ -58,7 +58,7 @@ public class Patient implements IPatient {
     @Column(name = "reason_deleted", nullable = true)
     private String reasonDeleted;
     @Column(name = "birthday_is_fake", nullable = true)
-    private boolean birthdayIsFake;
+    private Boolean birthdayIsFake;
 
     @Override
     public int getId() {
@@ -189,10 +189,10 @@ public class Patient implements IPatient {
     
 
     @Override
-    public void setBirthdayIsFake(boolean isFake) { this.birthdayIsFake = isFake; }
+    public void setBirthdayIsFake(Boolean isFake) { this.birthdayIsFake = isFake; }
 
     @Override
-    public boolean getBirthdayIsFake() { return birthdayIsFake; }
+    public Boolean getBirthdayIsFake() { return birthdayIsFake; }
 
 
 }
