@@ -20,7 +20,7 @@ Notes:
 
 \# | Description | Rationale
 ---|---|---
-1 | We understand the problem in the persistent storing layer, but not quite sure how the where exactly to reproduce the problem and test after changing. So we sent email to Kevin Zurek for some clarifications. According to Kevin's response, the problem is that when researchers export data to csv file, there is no flag to tell whether or not the patient's birthdate is real. | Clarify the problem.
+1 | We understand the problem in the persistent storing layer, but not quite sure how and where exactly to reproduce the problem and test after changing. So we sent email to Kevin Zurek for some clarifications. According to Kevin's response, the problem is that when researchers export data to csv file, there is no flag to tell whether or not the patient's birthdate is real. | Clarify the problem.
 2 | We think more than one location might be involved in this change. We list them as:<br> 1. CSV exporting logic. <br> 2. Database structure. <br> 3. Models. <br> 4. User Interface. | We were not sure if database supports this feature.
 3 | We decided to do the concept location phase for the two locations separately. | The two locations seems far from each other.
 
@@ -61,17 +61,14 @@ Notes:
 __Time Spent: 120 mins__  
 __Recorder: Shane Qi__
 
----
-
-### TO BE CONTINUE
-
-
-<!--
 
 ## Impact Analysis
 
 \# | Description | Rationale
 ---|---|---
+1 | We have the initial impact set: ()<br>`ResearchController`(CHANGED), <br>`Patient`(CHANGED), <br>`TriageController`(CHANGED)) |
+2 |
+
 1 | We have the initial impact set: (`EditViewModel`, `UsersController`). And marked `EditViewModel` as 'CHANGED'. |
 3 | We looked into class `UsersController`, actually it doesn't directly have an property of type `EditViewModel`. It has an property of  type `From<EditViewModel>`. |
 6 | We found out definition of `From<T>` with shortcut COMMAND + CLICK. It turns out a play framework class. We put this class into impact set but marked as 'UNCHANGED' and marked `UsersController` as 'NEXT'. | We can't change framework classes.
@@ -171,4 +168,4 @@ Concept location and impact analysis was completed mainly with find tool within 
 As we recored in the first step of Validation phase, there isn't a configured unit test environment for this project, so we just manually tested bug fixing from front end. In order to make is more reliable, we did a lot comprehensive tests. Since the change is a minor one, we think those tests are sufficient.
 
 Classes and methods changed:
-- `./app/femr/ui/models/admin/users/EditViewModel/EditViewModel.validate()` -->
+- `./app/femr/ui/models/admin/users/EditViewModel/EditViewModel.validate()`
