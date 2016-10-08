@@ -25,6 +25,7 @@ Notes:
 3 | We decided to do the concept location phase for the two locations separately. | The two locations seems far from each other.
 
 ### CSV Exporting
+
 \# | Description | Rationale
 ---|---|---
 1 | We ran the system. |
@@ -103,33 +104,50 @@ __Recorder: Shane Qi__
 
 \# | Description | Rationale
 ---|---|---
-1 | working on this|
-2 | We decided to skip refactoring. |
+1 | We went to `config/evolutions.default` and added a new evolution script called 99.sql which alters the `patients` table by adding a new boolean column `birthday_is_fake` which is null by default thus patients who have already registered are having the null value for the flag until their next visit. | According to Kevin’s email, adding a column to the `patients` table is an option to solve this issue, and we do think it is the safest way. Since database structure is the prerequisites for all the following changes, we put it in prefactoring phase.
+2 | We went into interface `IPatient` and added abstract getter and setter of new column/property `birthdayIsFake`. | Implementation changes were left for actualization phase.
+3 | We went into interface `IDataModelMapper` and added a parameter `birthdayIsFake` into the abstract method `createPatient`. | Implementation changes were left for actualization phase.
 
-__Time Spent: 10 mins__  
-__Recorder: Shane Qi__
+__Time Spent: 20 mins__  
+__Recorder: Tianxiang Zhang__
 
+## Actualization
 
-
-\# | Actualization | Rationale
+\# | Description | Rationale
 ---|---|---
-1 | We went to `config/evolutions.default` and added a new evolution script called 99.sql which alter the `patients` table by adding a new boolean column `birthday_is_fake` which is null by default thus patients who have already registered are having the null value for the flag until their next visit. | According to Kevin’s email, adding a column to the `patients` table is an option to solve this issue, and we do think it is the safest way.
-2 | We looked into the java class `Patient` and added the corresponding data field, `birthdayIsFake` as well as the “set" and “get” methods, thus the `birthday_is_fake` could be accessed now. |
-3 | Same process for `PatientItem` to make sure all the related classes have this data field.|
-4 | In `patientService` which creates new `patient` object, we need to add a new argument `birthdayIsFake` so the number of parameters matches out constructor.|
-5 | Then we looked into DataModelMapper and IDataModelMapper to add a new boolean argument `birthdayIsFake` as the parameter of `createPatient` method | Logically, we need another data field to record if the patient has a fake birthday or not, thus when we create it we also need it as a input parameter.
-6 | We also added the same data field into the interface `IPatient` which is implemented by the `Patient` class| 
-7 | We added a new class in `triage.css` called `checkBoxLabel` and thus we could add a good-looking checkbox onto the `triage` page to ask the user explicitly if the birthday is fake or not. |
-8 | We walked into the `searchService` and added the `birthday_is_fake` as well thus the search service under `triage` module will also return this information.|
-9 | Then we added the flag variable `birthdayIsFake` for the input boolean status of the mentioned checkbox in `IndexViewModelPost`, as well as the get and set methods. |
-10 | In the `TriageController` class we invoked `patient.setBirthdayIsFake()` with the input parameter `viewModelPost.getBirthdayIsFake()` which comes directly from the user.|  
-11 | We went into `itemModelMapper` and `iItemModelMapper` to add the corresponding `birthdayIsFake` bool data field to make sure the mapping between database and our object keeps tight and complete. |
-12 | In `researchExportItem`, we added a new method that will create a new cloumn of `birthday` which would be used to store birthday and the fake birthday flag(if applicable).|
-13 | We also modified `researchService` which is reposiponsible for exporting patient's data into CSV file. In this class, we have to also add some conditions to output the correct birthday information, which would be discussed soon. | We need to implement a condition that can correctly output 4 kinds of `birthday` column value, 1. accurate date. 2. date + "fake" indicating a fake birthday 3. empty string which indicates there is only classification instead of birthday 4. "unknown" string for those patients who have joined before this fix released.
-14 | In `researchService`, we added a new outout column which will be filled into `birthday` mentioned in `step 12`. We then set a `if` statement to determine if the `age` column in `patients` is null or not (the confusing part here is that `age` column actually stores birthday in `date` type). As long as it is not null we output the birthday (otherwise we mark it “unknown"), in addition, if the `birthdayIsFake` flag is `true`, we add another string “(fake)” after the birthday. | Current excel has only the age column, and we want to output the birthday from database as well as the flag to indicate if the date is fake or not
+1 | Since database altering was done in prefactoring phase, we split the actualization into three parts:  <br> 1. Models.  <br> 2. User Interface. <br>3. CSV exporting logic. |
 
-__Time Spent: 120 mins__  
-__Recorder: Shane Qi__
+### Models
+
+\# | Description | Rationale
+---|---|---
+1 | We looked into the java class `Patient` and added the corresponding data field, `birthdayIsFake` as well as the “set" and “get” methods, thus the `birthday_is_fake` could be accessed now. |
+2 | We went into class `DataModelMapper`, and did the changes corresponding to interface's `createPatient` method change. |
+3 | We went into class `PatientItem` class and added `birthday_is_fake` property and it's setter and getter. | `PatientItem` doesn't conform to any interface.
+4 | We went into interface `IItemModelMapper`, and added a parameter `birthday_is_fake` into method `createPatientItem`. |
+5 | We went into class `ItemModelMapper` and changed the method `createPatientItem` corresponding to its interface. |
+6 | We went into class `PatientService` which creates new `Patient` and `PatientItem` object. We need to add a new argument `birthdayIsFake` so the number of parameters matches out constructor (`DataModelMapper.createPatient()` and `ItemModelMapper.createPatientItem()`). |
+7 | We went into class `searchService` which creates new `PatientItem` object. We also need to add a new argument `birthdayIsFake` so the number of parameters matches constructor (`ItemModelMapper.createPatientItem()`). |
+
+### User Interface
+
+\# | Description | Rationale
+---|---|---
+1 | We added a new class in `triage.css` called `checkBoxLabel` and thus we could add a good-looking checkbox onto the `triage` page to ask the user explicitly if the birthday is fake or not. |
+2 | We added the 'birthday is fake' check-box into `./app/femr/ui/views/triage/index.scala.html`. |
+3 | Then we added the flag variable `birthdayIsFake` for the input boolean status of the mentioned checkbox in `IndexViewModelPost`, as well as the get and set methods. | `IndexViewModelPost` is the class that html form bind to.
+
+### CSV Exporting
+
+\# | Description | Rationale
+---|---|---
+1 | In the `TriageController` class we invoked `patient.setBirthdayIsFake()` with the input parameter `viewModelPost.getBirthdayIsFake()` which comes directly from the user.|  
+2 | In `researchExportItem`, we added a new method that will create a new cloumn of `birthday` which would be used to store birthday and the fake birthday flag(if applicable).|
+3 | We also modified `ResearchService` which is reposiponsible for exporting patient's data into CSV file. In this class, we have to also add some conditions to output the correct birthday information, which would be discussed soon. | We need to implement a condition that can correctly output 4 kinds of `birthday` column value, 1. accurate date. 2. date + "fake" indicating a fake birthday 3. empty string which indicates there is only classification instead of birthday 4. "unknown" string for those patients who have joined before this fix released.
+4 | In `ResearchService`, we added a new outout column which will be filled into `birthday` mentioned in `step 12`. We then set a `if` statement to determine if the `age` column in table `patients` is null or not (the confusing part here is that `age` column actually stores birthday in `date` type). As long as it is not null we output the birthday (otherwise we mark it “unknown"), in addition, if the `birthdayIsFake` flag is `true`, we add another string “(fake)” after the birthday. | Current excel has only the age column, and we want to output the birthday from database as well as the flag to indicate if the date is fake or not
+
+__Time Spent: 40 mins__  
+__Recorder: Tianxiang Zhang__
 
 
 ## Postfactoring
@@ -137,25 +155,27 @@ __Recorder: Shane Qi__
 \# | Description | Rationale
 ---|---|---
 1 | We reviewed the change we made, not any anti-patterns were introduced. | The change we made is not a big one.
-2 | We decided to skip postfactoring.  |
+2 | We decided to skip postfactoring. |
 
-__Time Spent: 10 mins__  
-__Recorder: Shane Qi__
+__Time Spent: 20 mins__  
+__Recorder: Tianxiang Zhang__
 
+## Validation
 
-\# | Validation | Rationale
+\# | Description | Rationale
 ---|---|---
 1 | Test case defined:<br>Inputs:<br>-input 02/20/1993 as the genuine birthday without checking the checkbox<br>Expected output:<br>Birthday column: 02/20/1993 | Regular expected behavior test.<br>Result: 2/20/93 passed
 2 | Test case defined:<br>Inputs:<br>-input 02/20/1993 as a fake birthday with checkbox checked<br>Expected output:<br>Birthday column: 02/20/1993(fake) | Regular expected behavior test.<br>Result: 02/20/1993(fake) passed
-3 | Test case defined:<br>Inputs:<br>-input teen(13-17) as the classification without checking the checkbox<br>Expected output:<br>Birthday column: `nothing` | Regular expected behavior test.<br>Result: returns nothing, passed 
+3 | Test case defined:<br>Inputs:<br>-input teen(13-17) as the classification without checking the checkbox<br>Expected output:<br>Birthday column: `nothing` | Regular expected behavior test.<br>Result: returns nothing, passed
 4 | Test case defined:<br>Inputs:<br>-input teen(13-17) as the classification with the checkbox checked saying it is a fake birthday<br>Expected output:<br>Birthday column: `nothing` | Exceptional behavior test. This case demonstrates the scenario when a patient claims his or her birthday as fake yet he or she does not even submit a birthday.<br>Result: returns nothing, passed
-5 | Test case defined:<br>Inputs:<br>-input 16 years as the age with the checkbox checked saying it is a fake birthday<br>Expected output:<br>Birthday column: 10/03/2000(fake) | Regular expected behavior test.<br>Result: 10/03/2000(fake) as expected, passed 
-6 | Test case defined:<br>Inputs:<br>-this is a sad story<br>-going to the hospital on birthday<br>-input 16 years as the genuine age with the checkbox unchecked<br>Expected output:<br>Birthday column:10/03/2000 | Regular expected behavior test.<br>Result: 10/03/00 passed 
-
+5 | Test case defined:<br>Inputs:<br>-input 16 years as the age with the checkbox checked saying it is a fake birthday<br>Expected output:<br>Birthday column: 10/03/2000(fake) | Regular expected behavior test.<br>Result: 10/03/2000(fake) as expected, passed
+6 | Test case defined:<br>Inputs:<br>-this is a sad story<br>-going to the hospital on birthday<br>-input 16 years as the genuine age with the checkbox unchecked<br>Expected output:<br>Birthday column:10/03/2000 | Regular expected behavior test.<br>Result: 10/03/00 passed
 
 __Time Spent: 40 mins__  
-__Recorder: Shane Qi__
+__Recorder: Tianxiang Zhang__
 
-##Conclusion
+## Conclusion
 
-The whole change is not that tricky. We have come up with several solutions but adding a column seems like the safest one as well as the one that could be achieved after we analyzed the structure of the `triage` module. Adding a data field in `patient` object did not take too long, but it was really time-consuming to figure out where the constructor is used. Also, it also took a lot of time for us to make every mapping complete including the mapping between front-end objects and back-end objects, database table column and `patient` data field, CSV column and database column, etc. In validation section we've tested 6 cases which were generated by the cartisian product of {checked box or not} and {classification, accurate birthday, year and month}, and all of them passed the tests as expected. The only thing that's missing (and also the thing that we cannot help) is about the flag for those people who have joined before our change. Since there was no flag, all the previous birthday data are marked as unknown since we could not find any evidence to prove if any of them are fake or not, but the good news is that, once the patients come again, they could renew their birthday information and overwrite the previous records, so sooner or later we would update all the previous birthday records by patients themselves' help and the researchers would be able to access those data without any convern to the fake birthday issue.
+The whole change is not that tricky. We have come up with several solutions but adding a column seems like the safest one as well as the one that could be achieved after we analyzed the structure of the `triage` module. Adding a data field in `patient` object did not take too long, but it was really time-consuming to figure out where the constructor is used. Also, it also took a lot of time for us to make every mapping complete including the mapping between front-end objects and back-end objects, database table column and `patient` data field, CSV column and database column, etc.
+
+In validation section we've tested 6 cases which were generated by the cartisian product of {checked box or not} and {classification, accurate birthday, year and month}, and all of them passed the tests as expected. The only thing that's missing (and also the thing that we cannot help) is about the flag for those people who have joined before our change. Since there was no flag, all the previous birthday data are marked as unknown since we could not find any evidence to prove if any of them are fake or not, but the good news is that, once the patients come again, they could renew their birthday information and overwrite the previous records, so sooner or later we would update all the previous birthday records by patients themselves' help and the researchers would be able to access those data without any convern to the fake birthday issue.
