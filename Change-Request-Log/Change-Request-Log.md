@@ -19,13 +19,12 @@ The generated PDF is not displaying the amount of a prescription that was dispen
 
 ## Concept Location
 
-
 \# | Description | Rationale
 ---|---|---
-1 | We ran the system. | 
+1 | We ran the system. |
 2 | According to steps in the issue description (also refered to TA's email), we reproduced the problem in the localhost website. | In order to locate the page of the problem that the change request talks about.
 3 |The steps are following: assigning the user to a trip, creating new prescription with enough inventory, creating a new patient and prescribing the patient some medicine we created before, dispensing the prescription in pharmacy and then fetching the patient history so we can click `generate PDF` to print out the pdf.|
-4 |Accoring to the page uri (`history/encounter/####`), we understood what the format/template of prescription table should be.|We need to have a formal format to demonstrate the amount of medicine so that it is readable and understandable. If there is no such template found elsewhere, we would add a column called quantity between Original and Replaced. 
+4 |Accoring to the page uri (`history/encounter/####`), we understood what the format/template of prescription table should be.|We need to have a formal format to demonstrate the amount of medicine so that it is readable and understandable. If there is no such template found elsewhere, we would add a column called quantity between Original and Replaced.
 5 | According to the page uri (`history/encounter/####`), we located the 'Generate PDF' button in file: `./app/femr/ui/views/history/indexEncounter.scala` | In order the find out which class in responsive for generating pdf.
 6 | We looked into the html, find out this button goes into method `Result index(int encounterId)` of class `PDFController`. | In order to find out code about generating PDF.
 7 | Method `Result index(int encounterId)` does an internal call to method `byte[] buildPDF(int encounterId)`, we went to this private method via shorcut 'Command + Left Click' | We wanted to track back to those code that generates directly.
@@ -39,15 +38,14 @@ The generated PDF is not displaying the amount of a prescription that was dispen
 15 | We went to `PDFController.java` and tried if each `prescriptionItem` has a list of `activeDrug`. As expected, it does.|`IndexEncounter.scala.html` indicates that for each prescription item, it stores a list of activedurg type objects which contain active drug name, value and unit inside.
 16 | We decide to start a new method in `ActiveIngredient` to return the `activeIngredient` object’s name,value and unit by formatted string and marked it changed.| Since any change about the prescription itself is not logically related to `PDFController`, so we decided to move on to `prescriptionItem` to see if it is the first class to change. And the answer is no because it has a data field which is a list of `activeIngredient` type. So we looked in to the `activeIngredient` and considered to add a method to return the detailed information. And hence all the details can be returned by a for loop operating on the `activeIngredient` list.
 
+__Time Spent: 40 mins__  
+__Recorder: Tianxiang Zhang__
 
-__Time Spent: 40 mins__
-__Recorder: Shane Qi__
- 
 ## Impact Analysis
 
 Use the table below to describe each step you followed when performing impact analysis for this change request. Include as many details as possible, including why classes are visited or why they are discarded from the ones that have to change.
 Do not take the impact analysis of your changes lightly. Remember that any small change in the code could lead to large changes in the behavior of the system. Follow the process on impact analysis covered in the class. Describe in details how you followed this process in the change request log. Provide details on how and why you finished the impact analysis process.
- 
+
 \# | Description | Rationale
 ---|---|---
 1 | We made a breakpoint around code of generating prescription items table and generated a pdf again. | In order to know how the button click event goes all the way to the code, and how many classed/methods are involved.
@@ -64,7 +62,7 @@ Do not take the impact analysis of your changes lightly. Remember that any small
 
 
 __Time spent: 30 mins__
-__Recorder: Shane Qi__
+__Recorder: Tianxiang Zhang__
 
 ## Prefactoring
 
@@ -74,7 +72,7 @@ __Recorder: Shane Qi__
 2 | We decided to skip refactoring. |
 
 __Time Spent: 10 mins__  
-__Recorder: Shane Qi__
+__Recorder: Tianxiang Zhang__
 
 ## Actualization
 
@@ -86,7 +84,7 @@ __Recorder: Shane Qi__
 4 | Last but not least, we noticed that during the producing of table cells, only `getName()` was called and we need to replace it with our newly added method `getPrescriptionDetail()` to return all the data we fetched from related objects, including the prescription’s name as well.|
 
 __Time Spent: 30 mins__  
-__Recorder: Shane Qi__
+__Recorder: Tianxiang Zhang__
 
 ## Postfactoring
 
@@ -95,7 +93,7 @@ __Recorder: Shane Qi__
 1 | Skipped for this request | The thing we did to perform the change was adding methods that return some strings without changing any data fields or utilities. So the change is pretty small and involved with no structural issues.
 
 __Time Spent: 10 mins__  
-__Recorder: Shane Qi__
+__Recorder: Tianxiang Zhang__
 
 ## Validation
 
@@ -108,10 +106,8 @@ __Recorder: Shane Qi__
 5 | Test case defined:<br>Inputs:<br>-10 days 0 Proventil 90 mcg albuterol (MDI)<br>Expected output:<br>“<br>0 Proventil<br>      90 mcg albuterol (MDI)<br>“| Exceptional behavior test.<br>The test passed.
 6 | Test case defined:<br>Inputs:<br>10 days 1000 Proventil 90 mcg albuterol (MDI)<br>-inventory for that kind of medicine is 100<br>Expected output:<br>“<br>There should be some kind of warning regarding this problem.<br>“|Exceptional behavior test.<br>This test is actually testing not only the PDF but also the femr inventory system. It passed since the system prompted us that the inventory is not enough.
 
-
-
 __Time Spent: 20 mins__  
-__Recorder: Shane Qi__
+__Recorder: Tianxiang Zhang__
 
 ## Timing
 
@@ -127,7 +123,6 @@ Documentation (this log) | 100
 Total | 240
 
 __Recording Time Included__
-__Recorder: Shane Qi__
 
 ## Reverse engineering
 
@@ -141,12 +136,13 @@ __Recorder: Shane Qi__
 
 ## Conclusions
 For this change, the actualization part is respectively easier. It did not request much coding skill but just some understanding about OOP and the ability to code some basic string operation and thus we had millions of ways to make the change, i.g. directly created a new method under PDFController and call it in the `getAssessment()` method. But we understood that each method should be logically related to the class and abandoned this solution since the method that prints the prescription details is not relevant to `PDFController` thus it is preferred to be inside the priscriptionItem class. Hence, we took most time focusing on impact analysis and concept location. These two parts directed us to locate where the changes should be made without hurting the logical structure of the project.
+
 After the change, we did some tests on the new utility. Since the change involved with only showing some strings and the femr system has already set many restrictions to make sure the amount and content of a prescription be legit, we don’t have many exceptional behavior test cases to test the new code, yet all the cases we could come up with passed.
 
 Class and methods changed:<br>
--`App/femr/common/models/MedicationItem.java`<br>
-	--- String getActiveIngredientDetails()
-<br>-`App/femr/common/models/PrescriptionItem.java`<br>
-	--- String getPrescriptionDetails()
-<br>-`App/femr/ui/controllers/PDFController.java`<br>
-	--- getAssessment()
+- `App/femr/common/models/MedicationItem.java`  
+`String getActiveIngredientDetails()`
+- `App/femr/common/models/PrescriptionItem.java`  
+	`String getPrescriptionDetails()`
+- `App/femr/ui/controllers/PDFController.java`  
+  `getAssessment()`
