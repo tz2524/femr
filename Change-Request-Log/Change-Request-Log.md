@@ -30,7 +30,7 @@ Action should only be taken if these fields are filled out - they shouldn't be r
 13 | Besides, in the debug view, we track the invoking stack, the invoking chain only contains three internal invocations: the first was Routes (we don’t care), the second was in UsersController (we’d been here), it was the invocation of method `bindFromRequest()` of class `Form<>`, the third was `validate()` method of class `EditViewModel`. |
 14 | ![](debug-all.png) |
 15 | ![](debug-internal.png)| |
-14 | According to what we found out above, we marked these two classes: `UsersController` and `EditViewModel`. | Directly modify `validate()` method of class `EditViewModel` might not be a good decision, because of possible hierarchy and polymorphism. So we also include class `UsersController` into init impact set.
+16 | According to what we found out above, we marked these two classes: `UsersController` and `EditViewModel`. | Directly modify `validate()` method of class `EditViewModel` might not be a good decision, because of possible hierarchy and polymorphism. So we also include class `UsersController` into init impact set.
 
 __Time Spent: 120 mins__  
 __Recorder: Shane Qi__
@@ -40,8 +40,8 @@ __Recorder: Shane Qi__
 \# | Description | Rationale
 ---|---|---
 1 | We have the initial impact set: (`EditViewModel`, `UsersController`). And marked `EditViewModel` as 'CHANGED'. |
-3 | We looked into class `UsersController`, actually it doesn't directly have an property of type `EditViewModel`. It has an property of  type `From<EditViewModel>`. |
-6 | We found out definition of `From<T>` with shortcut COMMAND + CLICK. It turns out a play framework class. We put this class into impact set but marked as 'UNCHANGED' and marked `UsersController` as 'NEXT'. | We can't change framework classes.
+2 | We looked into class `UsersController`, actually it doesn't directly have an property of type `EditViewModel`. It has an property of  type `From<EditViewModel>`. |
+3 | We found out definition of `From<T>` with shortcut COMMAND + CLICK. It turns out a play framework class. We put this class into impact set but marked as 'UNCHANGED' and marked `UsersController` as 'NEXT'. | We can't change framework classes.
 4 | We search the usage of class `EditViewModel`) with shortcut OPTION + F7 (Find usage tool). There is only one instance creation in `UsersController`. And there is no subclassed inherited from `EditViewModel`. `EditViewModel` is not any class's subclass, either. | Analysis dependencies and try to add more class into estimated impact set.
 5 | We search the usage of class `UsersController`) with shortcut OPTION + F7 (Find usage tool). Except usages in routers and templates. There is reference to any instance of `UserController`.  There is no subclassed inherited from `UserController`, either. (not unexpected for an controller class.) | Analysis dependencies and try to add more class into estimated impact set.
 6 | We had an estimated impact set: (`EditViewModel`(CHANGED), `UsersController`(NEXT), `Form<T>`(UNCHANGED)). | Finished impact set analysis.
@@ -49,9 +49,9 @@ __Recorder: Shane Qi__
 8 | The invocation chain from `UsersController` to `EditViewModel` is: `UsersController.editPost()` -> `Form<EditViewModel>.bindFromRequest()`(framework) -> `Form<EditViewModel>.bind()`(framework) -> `EditViewModel.validate()`. | In order to inspect deeply into `UsersController`.
 9 | We found out that no matter what errors returned from `Form<EditViewModel>.bindFromRequest()`, `UsersController` just naively forward errors to the front end (render bad request view).  |
 10 | And even if in the case that `userPassword` and `userPasswordVerify` being both empty is not treated as an error (how we planed to fix the bug), there is a `if` statement to check if two fields are both filled before perform the next action (perform password changing). |
-10 | According to the above two points, if we change the logic of `EditViewModel.validate()`, `UsersController` is not gonna be impacted. So we marked `UsersController` as 'UNCHANGED'. | `UsersController` is not gonna be impacted.
-11 | No class is marked 'NEXT', we finished impact analysis with a result set: (`EditViewModel`(CHANGED), `UsersController`(UNCHANGED), `Form<T>`(UNCHANGED)). |
-12 | ![](impact-analysis.png) |
+11 | According to the above two points, if we change the logic of `EditViewModel.validate()`, `UsersController` is not gonna be impacted. So we marked `UsersController` as 'UNCHANGED'. | `UsersController` is not gonna be impacted.
+12 | No class is marked 'NEXT', we finished impact analysis with a result set: (`EditViewModel`(CHANGED), `UsersController`(UNCHANGED), `Form<T>`(UNCHANGED)). |
+13 | ![](impact-analysis.png) |
 
 __Time Spent: 120 mins__  
 __Recorder: Shane Qi__
@@ -95,14 +95,14 @@ __Recorder: Shane Qi__
 \# | Description | Rationale
 ---|---|---
 1 | Since we found out that most code under `test` directory was commented out, we asked the team via Slack for some clarification of unit tests. It turned out they had a long story of unit tests and they don't have a unit test environment for now. We decided to have more comprehensive tests from front end.  |
-1 | We re-ran the system. | Making sure change was applied to the system.
-2 | We went to the users page and began edit the information of the user we used to login. | Edit the user we used to login makes it easy for us to verify if we successfully changed the password in the next step.
-3 | __First case__: only change the 'About' information of the user and submit the form. Then logout and login with original password. <br>__Expected result__: no error, 'About' information should be updated and re-login should succeed. <br>__Result__: no error, 'About' information was updated and re-login succeeded. | This is an exceptional behavior, if the two passwords fields are empty, just don't perform password changing and not throwing errors, either.
-4 | __Second case__: fill the two new password fields with a valid password, then re-loin with the new password. <br>__Expected result__: no error, re-login with new password should succeed. <br>__Result__: no error, re-login with new password succeed. | This is an exceptional behavior, we kept what worked right working right.
-5 | __Third case__: only fill the new password field (without filling new password verify field) with a valid password, then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
-6 | __Third case__: only fill the verify new password field (without filling new password field) with a valid password, then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
-7 | __Third case__: fill the new password field with a valid password while fill the new password verify field a different valid password, then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
-8 | __Third case__: fill the two new password fields with an invalid password ("111" too short), then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
+2 | We re-ran the system. | Making sure change was applied to the system.
+3 | We went to the users page and began edit the information of the user we used to login. | Edit the user we used to login makes it easy for us to verify if we successfully changed the password in the next step.
+4 | __First case__: only change the 'About' information of the user and submit the form. Then logout and login with original password. <br>__Expected result__: no error, 'About' information should be updated and re-login should succeed. <br>__Result__: no error, 'About' information was updated and re-login succeeded. | This is an exceptional behavior, if the two passwords fields are empty, just don't perform password changing and not throwing errors, either.
+5 | __Second case__: fill the two new password fields with a valid password, then re-loin with the new password. <br>__Expected result__: no error, re-login with new password should succeed. <br>__Result__: no error, re-login with new password succeed. | This is an exceptional behavior, we kept what worked right working right.
+6 | __Third case__: only fill the new password field (without filling new password verify field) with a valid password, then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
+7 | __Third case__: only fill the verify new password field (without filling new password field) with a valid password, then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
+8 | __Third case__: fill the new password field with a valid password while fill the new password verify field a different valid password, then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
+9 | __Third case__: fill the two new password fields with an invalid password ("111" too short), then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
 
 __Time Spent: 20 mins__  
 __Recorder: Shane Qi__
