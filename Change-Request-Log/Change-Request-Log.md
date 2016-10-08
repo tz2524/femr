@@ -72,30 +72,30 @@ __Recorder: Shane Qi__
 1 | We have the initial impact set: (`ResearchService`, `Patient`, `TriageController`) |
 2 | We searched usages of `ResearchService` and `IResearchService` in the project via IDE 'search usages tool', included `ResearchController` into impact set. | In order to find classes that depends on `ResearchService`.
 3 | We did the dependencies analysis with IDE 'Analyze Dependencies' tool on class `ResearchService`, and put `ResearchExportItem` and `ResearchResultSetItem` into impact set | In order to find `ResearchService`'s dependencies.
-3 | We searched usages of `Patient` and its interface `IPatient` put `ResearchEncounter`, `PatientEncounter`, `PatientProvider`, `PatientService`, `PhotoService`, `SearchService`, and `DataModelMapper` into impact set. |
-4 | We did the dependencies analysis on `Patient`, and put `Photo` into impact set. |
-5 | We searched class `TriageController`'s usages, but there is no solid class except `Routes.scala`. We didn't put any other class into impact set here. |
-6 | We did dependencies analysis on `TriageController`, and put `PatientItem`, `ItemModelMapper`, `IndexViewModelPost` and `EncounterService` into impact set. |
-7 | We finished estimated impact set as: <br>![](estimated-impact-set.png) |
-8 | We marked `ResearchService` as 'CHANGED' and marked `ResearchExportItem`, `ResearchResultSetItem` and `ResearchController` as 'NEXT'. | We already decided to make changes on `ResearchService` in the concept location phase.
-9 | We inspected `ResearchExportItem`, this class is kind of a model of every CSV row, since we planed to add a column into CSV file, we marked this class as 'Changed'. |
-10 | We inspected `ResearchResultSetItem`, this class doesn't hold information about CSV file, we marked it as 'Unchanged'. |
-11 | We inspected `ResearchController`, this class only dispatch different requests to different delegate class and return the responses with content, doesn't hold logic about response content, we marked it as 'Unchanged'. |
-12 | We marked `Patient` as 'Changed'. And marked `ResearchEncounter`, `PatientEncounter`, `PatientProvider`, `PatientService`, `PhotoService`, `SearchService`, `DataModelMapper` and `Photo` as 'NEXT'. | This is a member of initial impact set, should be marked 'Changed' and mark neighbors as 'NEXT'.
-13 | We inspected `ResearchEncounter`, it doesn't hold patients' birthday information, we marked it as 'Unchanged'  |
-14 | We inspected `PatientEncounter`, it doesn't hold patients' birthday information, we marked it as 'Unchanged'  |
-15 | We inspected `PatientProvider`, it's an generics interface in defined in Play framework, can't be changed, we marked it as 'Unchanged'.  |
-16 | We inspected `PatientService`, this is kind of an middleware between database and MVC framework, since model `Patient` is gonna be changed, we marked it as 'Changed'.  |
-17 | We inspected `PhotoService`, it only deal with fetching and saving a patient's photo, since we won't make change on patient photo, we marked this class as 'Unchanged'.  |
-18 | We inspected `SearchService`, it contains a method which fetch a patient's whole information by id, since we were gonna make changes on model `Patient`, we marked this class as 'Changed'. |
-19 | We inspected `DataModelMapper`, it's the map between model's properties and database column, it definitely need changed, we marked it as 'Changed'. |
-20 | We inspected `Photo`, this is a model class, a photo belongs to a patient, it won't be impacted by change on `Patient`, we marked it as 'Unchanged'.  |
-21 | We marked `TriageController` as 'Changed'. And marked `PatientItem`, `ItemModelMapper`, `IndexViewModelPost` and `EncounterService` with 'NEXT'. | This is a member of initial impact set, should be marked 'Changed' and mark neighbors as 'NEXT'.
-22 | We inspected `PatientItem`, this is kind of a wrapper class making model `Patient` adaptive to other classes like `IndexViewModelPost`. It has all properties corresponding to `Patient`. Since `Patient` is gonna be changed, we marked this class with 'Changed'. |
-22 | We inspected `ItemModelMapper`, it's the mapper class which contains `PatientItem`'s map method, we had to marked it as 'Changed' since `PatientItem` was marked 'Changed'. |
-23 | We inspected `IndexViewModelPost`, this class is a viewModel class. Front end (html) form information will be bind to this class's properties. Since the we were gonna do a little change from front end, we marked this class with 'Changed'. |
-24 | We inspected `EncounterService`, this class fetches and stores patient's encounters, won't be impacted. We marked it with 'Unchanged'. |
-25 | No more classes are marked 'NEXT', we finished impact analysis with: <br>![](impact-analysis.png) |
+4 | We searched usages of `Patient` and its interface `IPatient` put `ResearchEncounter`, `PatientEncounter`, `PatientProvider`, `PatientService`, `PhotoService`, `SearchService`, and `DataModelMapper` into impact set. |
+5 | We did the dependencies analysis on `Patient`, and put `Photo` into impact set. |
+6 | We searched class `TriageController`'s usages, but there is no solid class except `Routes.scala`. We didn't put any other class into impact set here. |
+7 | We did dependencies analysis on `TriageController`, and put `PatientItem`, `ItemModelMapper`, `IndexViewModelPost` and `EncounterService` into impact set. |
+8 | We finished estimated impact set as: <br>![](estimated-impact-set.png) |
+9 | We marked `ResearchService` as 'CHANGED' and marked `ResearchExportItem`, `ResearchResultSetItem` and `ResearchController` as 'NEXT'. | We already decided to make changes on `ResearchService` in the concept location phase.
+10 | We inspected `ResearchExportItem`, this class is kind of a model of every CSV row, since we planed to add a column into CSV file, we marked this class as 'Changed'. |
+11 | We inspected `ResearchResultSetItem`, this class doesn't hold information about CSV file, we marked it as 'Unchanged'. |
+12 | We inspected `ResearchController`, this class only dispatch different requests to different delegate class and return the responses with content, doesn't hold logic about response content, we marked it as 'Unchanged'. |
+13 | We marked `Patient` as 'Changed'. And marked `ResearchEncounter`, `PatientEncounter`, `PatientProvider`, `PatientService`, `PhotoService`, `SearchService`, `DataModelMapper` and `Photo` as 'NEXT'. | This is a member of initial impact set, should be marked 'Changed' and mark neighbors as 'NEXT'.
+14 | We inspected `ResearchEncounter`, it doesn't hold patients' birthday information, we marked it as 'Unchanged'  |
+15 | We inspected `PatientEncounter`, it doesn't hold patients' birthday information, we marked it as 'Unchanged'  |
+16 | We inspected `PatientProvider`, it's an generics interface in defined in Play framework, can't be changed, we marked it as 'Unchanged'.  |
+17 | We inspected `PatientService`, this is kind of an middleware between database and MVC framework, since model `Patient` is gonna be changed, we marked it as 'Changed'.  |
+18 | We inspected `PhotoService`, it only deal with fetching and saving a patient's photo, since we won't make change on patient photo, we marked this class as 'Unchanged'.  |
+19 | We inspected `SearchService`, it contains a method which fetch a patient's whole information by id, since we were gonna make changes on model `Patient`, we marked this class as 'Changed'. |
+20 | We inspected `DataModelMapper`, it's the map between model's properties and database column, it definitely need changed, we marked it as 'Changed'. |
+21 | We inspected `Photo`, this is a model class, a photo belongs to a patient, it won't be impacted by change on `Patient`, we marked it as 'Unchanged'.  |
+22 | We marked `TriageController` as 'Changed'. And marked `PatientItem`, `ItemModelMapper`, `IndexViewModelPost` and `EncounterService` with 'NEXT'. | This is a member of initial impact set, should be marked 'Changed' and mark neighbors as 'NEXT'.
+23 | We inspected `PatientItem`, this is kind of a wrapper class making model `Patient` adaptive to other classes like `IndexViewModelPost`. It has all properties corresponding to `Patient`. Since `Patient` is gonna be changed, we marked this class with 'Changed'. |
+24 | We inspected `ItemModelMapper`, it's the mapper class which contains `PatientItem`'s map method, we had to marked it as 'Changed' since `PatientItem` was marked 'Changed'. |
+25 | We inspected `IndexViewModelPost`, this class is a viewModel class. Front end (html) form information will be bind to this class's properties. Since the we were gonna do a little change from front end, we marked this class with 'Changed'. |
+26 | We inspected `EncounterService`, this class fetches and stores patient's encounters, won't be impacted. We marked it with 'Unchanged'. |
+27 | No more classes are marked 'NEXT', we finished impact analysis with: <br>![](impact-analysis.png) |
 
 __Time Spent: 120 mins__  
 __Recorder: Shane Qi__
