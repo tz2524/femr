@@ -32,7 +32,9 @@ Notes:
 3 | We navigated to the html template file of 'research' view (`./app/femr/ui/views/admin/research/index.scala.html`) via IDE project tree view window. | According to common sense of web framework, there should a template file of the edit page. And it turned out there does is a template html file.
 4 | We searched keywords 'Export Data' in the template html file, and find the button dom. But no lucky, can't see what action the button triggers. |
 5 | We made an assumption that the button fires an Javascript function. So we went to the browser, used the browser developing tool to find out the dom id of the 'Export Data' button, then search the id ('export-button') as keywords in all Javascript files of this webpage. We finally found out that the button does fire a Javascript function which just simply submits the form with id 'graph-options'. | Here we used some acknowledge of Javascript and jQuery which we didn't record much details.
-6 | We went back to the html template file of 'research' view (`./app/femr/ui/views/admin/research/index.scala.html`) and searched the form with id 'graph-options', and we finally found out that CSV files comes from `ResearchController.exportPost`. We put class `ResearchController` into the initial impact set. | Successfully located CSV exporting concept location.
+6 | We went back to the html template file of 'research' view (`./app/femr/ui/views/admin/research/index.scala.html`) and searched the form with id 'graph-options', and we finally found out that CSV files comes from `ResearchController.exportPost()`. |
+7 | In `ResearchController.exportPost()`, we found out that it only simply returns response along with the CSV file. CSV file actually comes from interface method: `IResearchService.retrieveCsvExportFile()`. We used IDE 'navigate to implementations' tool navigated to class `ResearchService` which implements method `retrieveCsvExportFile()`. |
+8 | We looked into `ResearchService` a little bit, it has a private method `createResearchExportItem()` which is in charge of adding fields for every CSV row. We put class `ResearchService` into our initial impact set. | Successfully located CSV exporting concept location.
 
 ### Database Structure
 
@@ -48,7 +50,7 @@ Notes:
 
 \# | Description | Rationale
 ---|---|---
-1 | We went the `./app/femr/data/models/` and found out the class `Patient`. We put class `Patient` into initial impact set. | According to common sense of MCV pattern, models are possibly defined here. And in the `Patient` class we found, there are properties binded to column.
+1 | Since we add a column into patients table, we went the `./app/femr/data/models/` and found out the class `Patient`. We put it into initial impact set. | According to common sense of MCV pattern, models are possibly defined here. And in the `Patient` class we found, there are properties binded to column.
 
 ### User Interface
 
@@ -66,106 +68,33 @@ __Recorder: Shane Qi__
 
 \# | Description | Rationale
 ---|---|---
-1 | We have the initial impact set: ()<br>`ResearchController`(CHANGED), <br>`Patient`(CHANGED), <br>`TriageController`(CHANGED)) |
-2 |
-
-1 | We have the initial impact set: (`EditViewModel`, `UsersController`). And marked `EditViewModel` as 'CHANGED'. |
-3 | We looked into class `UsersController`, actually it doesn't directly have an property of type `EditViewModel`. It has an property of  type `From<EditViewModel>`. |
-6 | We found out definition of `From<T>` with shortcut COMMAND + CLICK. It turns out a play framework class. We put this class into impact set but marked as 'UNCHANGED' and marked `UsersController` as 'NEXT'. | We can't change framework classes.
-4 | We search the usage of class `EditViewModel`) with shortcut OPTION + F7 (Find usage tool). There is only one instance creation in `UsersController`. And there is no subclassed inherited from `EditViewModel`. `EditViewModel` is not any class's subclass, either. | Analysis dependencies and try to add more class into estimated impact set.
-5 | We search the usage of class `UsersController`) with shortcut OPTION + F7 (Find usage tool). Except usages in routers and templates. There is reference to any instance of `UserController`.  There is no subclassed inherited from `UserController`, either. (not unexpected for an controller class.) | Analysis dependencies and try to add more class into estimated impact set.
-6 | We had an estimated impact set: (`EditViewModel`(CHANGED), `UsersController`(NEXT), `Form<T>`(UNCHANGED)). | Finished impact set analysis.
-7 | We started inspecting `UsersController`, and no other classes have to be marked as 'NEXT'. | `UsersController` is a class marked 'NEXT'.
-8 | The invocation chain from `UsersController` to `EditViewModel` is: `UsersController.editPost()` -> `Form<EditViewModel>.bindFromRequest()`(framework) -> `Form<EditViewModel>.bind()`(framework) -> `EditViewModel.validate()`. | In order to inspect deeply into `UsersController`.
-9 | We found out that no matter what errors returned from `Form<EditViewModel>.bindFromRequest()`, `UsersController` just naively forward errors to the front end (render bad request view).  |
-10 | And even if in the case that `userPassword` and `userPasswordVerify` being both empty is not treated as an error (how we planed to fix the bug), there is a `if` statement to check if two fields are both filled before perform the next action (perform password changing). |
-10 | According to the above two points, if we change the logic of `EditViewModel.validate()`, `UsersController` is not gonna be impacted. So we marked `UsersController` as 'UNCHANGED'. | `UsersController` is not gonna be impacted.
-11 | No class is marked 'NEXT', we finished impact analysis with a result set: (`EditViewModel`(CHANGED), `UsersController`(UNCHANGED), `Form<T>`(UNCHANGED)). |
-12 | ![](impact-analysis.png) |
+1 | We have the initial impact set: (`ResearchService`, `Patient`, `TriageController`) |
+2 | We searched usages of `ResearchService` and `IResearchService` in the project via IDE 'search usages tool', included `ResearchController` into impact set. | In order to find classes that depends on `ResearchService`.
+3 | We did the dependencies analysis with IDE 'Analyze Dependencies' tool on class `ResearchService`, and put `ResearchExportItem` and `ResearchResultSetItem` into impact set | In order to find `ResearchService`'s dependencies.
+3 | We searched usages of `Patient` and its interface `IPatient` put `ResearchEncounter`, `PatientEncounter`, `PatientProvider`, `PatientService`, `PhotoService`, `SearchService`, and `DataModelMapper` into impact set. |
+4 | We did the dependencies analysis on `Patient`, and put `Photo` into impact set. |
+5 | We searched class `TriageController`'s usages, but there is no solid class except `Routes.scala`. We didn't put any other class into impact set here. |
+6 | We did dependencies analysis on `TriageController`, and put `PatientItem`, `ItemModelMapper`, `IndexViewModelPost` and `EncounterService` into impact set. |
+7 | We finished estimated impact set as: <br>![](estimated-impact-set.png) |
+8 | We marked `ResearchService` as 'CHANGED' and marked `ResearchExportItem`, `ResearchResultSetItem` and `ResearchController` as 'NEXT'. | We already decided to make changes on `ResearchService` in the concept location phase.
+9 | We inspected `ResearchExportItem`, this class is kind of a model of every CSV row, since we planed to add a column into CSV file, we marked this class as 'Changed'. |
+10 | We inspected `ResearchResultSetItem`, this class doesn't hold information about CSV file, we marked it as 'Unchanged'. |
+11 | We inspected `ResearchController`, this class only dispatch different requests to different delegate class and return the responses with content, doesn't hold logic about response content, we marked it as 'Unchanged'. |
+12 | We marked `Patient` as 'Changed'. And marked `ResearchEncounter`, `PatientEncounter`, `PatientProvider`, `PatientService`, `PhotoService`, `SearchService`, `DataModelMapper` and `Photo` as 'NEXT'. | This is a member of initial impact set, should be marked 'Changed' and mark neighbors as 'NEXT'.
+13 | We inspected `ResearchEncounter`, it doesn't hold patients' birthday information, we marked it as 'Unchanged'  |
+14 | We inspected `PatientEncounter`, it doesn't hold patients' birthday information, we marked it as 'Unchanged'  |
+15 | We inspected `PatientProvider`, it's an generics interface in defined in Play framework, can't be changed, we marked it as 'Unchanged'.  |
+16 | We inspected `PatientService`, this is kind of an middleware between database and MVC framework, since model `Patient` is gonna be changed, we marked it as 'Changed'.  |
+17 | We inspected `PhotoService`, it only deal with fetching and saving a patient's photo, since we won't make change on patient photo, we marked this class as 'Unchanged'.  |
+18 | We inspected `SearchService`, it contains a method which fetch a patient's whole information by id, since we were gonna make changes on model `Patient`, we marked this class as 'Changed'. |
+19 | We inspected `DataModelMapper`, it's the map between model's properties and database column, it definitely need changed, we marked it as 'Changed'. |
+20 | We inspected `Photo`, this is a model class, a photo belongs to a patient, it won't be impacted by change on `Patient`, we marked it as 'Unchanged'.  |
+21 | We marked `TriageController` as 'Changed'. And marked `PatientItem`, `ItemModelMapper`, `IndexViewModelPost` and `EncounterService` with 'NEXT'. | This is a member of initial impact set, should be marked 'Changed' and mark neighbors as 'NEXT'.
+22 | We inspected `PatientItem`, this is kind of a wrapper class making model `Patient` adaptive to other classes like `IndexViewModelPost`. It has all properties corresponding to `Patient`. Since `Patient` is gonna be changed, we marked this class with 'Changed'. |
+22 | We inspected `ItemModelMapper`, it's the mapper class which contains `PatientItem`'s map method, we had to marked it as 'Changed' since `PatientItem` was marked 'Changed'. |
+23 | We inspected `IndexViewModelPost`, this class is a viewModel class. Front end (html) form information will be bind to this class's properties. Since the we were gonna do a little change from front end, we marked this class with 'Changed'. |
+24 | We inspected `EncounterService`, this class fetches and stores patient's encounters, won't be impacted. We marked it with 'Unchanged'. |
+25 | No more classes are marked 'NEXT', we finished impact analysis with: <br>![](impact-analysis.png) |
 
 __Time Spent: 120 mins__  
 __Recorder: Shane Qi__
-
-## Prefactoring
-
-\# | Description | Rationale
----|---|---
-1 | We inspected the method `EditViewModel.validate()`, we only need to add a handle for the case that both `userPassword` and `userPasswordVerify` are empty, no need for making big changes. |
-2 | We decided to skip refactoring. |
-
-__Time Spent: 10 mins__  
-__Recorder: Shane Qi__
-
-## Actualization
-
-\# | Description | Rationale
----|---|---
-1 | We looked into `EditViewModel.validate()`, found out that there are three `if` statement to validate password fields: `(newPassword.isEmpty() or newPasswordVerify.isEmpty()`, `!newPassword.equals(newPasswordVerify)` and whether `newPassword` conforms to constraints. |
-2 | When neither `userPassword` nor `userPasswordVerify` is filled, the control flow goes into the condition `(newPassword.isEmpty() or newPasswordVerify.isEmpty()`. | Inspect how the control flow is under the problem case.
-3 | We think those three `if` statements are only applicable under the case that neither `userPassword` nor `userPasswordVerify` is empty. | Find out what's wrong with the code.
-4 | We decided to embed all these three into another `if` statement: `if(!(newPassword.isEmpty() && newPasswordVerify.isEmpty()))`. | This change makes sure that only under the condition that neither `userPassword` nor `userPasswordVerify` is empty, the code perform the password fields validation. Otherwise, the code will just ignore the password fields (not returning any error).
-5 | We wrote the new `if` condition then moved those three condition into the new condition block. |
-6 | We committed and pushed our changes with git. | Just in case we need to revert our changes.
-
-__Time Spent: 30 mins__  
-__Recorder: Shane Qi__
-
-## Postfactoring
-
-\# | Description | Rationale
----|---|---
-1 | We reviewed the change we made, not any anti-patterns were introduced. | The change we made is not a big one.
-2 | We decided to skip postfactoring.  |
-
-__Time Spent: 10 mins__  
-__Recorder: Shane Qi__
-
-## Validation
-
-\# | Description | Rationale
----|---|---
-1 | Since we found out that most code under `test` directory was commented out, we asked the team via Slack for some clarification of unit tests. It turned out they had a long story of unit tests and they don't have a unit test environment for now. We decided to have more comprehensive tests from front end.  |
-1 | We re-ran the system. | Making sure change was applied to the system.
-2 | We went to the users page and began edit the information of the user we used to login. | Edit the user we used to login makes it easy for us to verify if we successfully changed the password in the next step.
-3 | __First case__: only change the 'About' information of the user and submit the form. Then logout and login with original password. <br>__Expected result__: no error, 'About' information should be updated and re-login should succeed. <br>__Result__: no error, 'About' information was updated and re-login succeeded. | This is an exceptional behavior, if the two passwords fields are empty, just don't perform password changing and not throwing errors, either.
-4 | __Second case__: fill the two new password fields with a valid password, then re-loin with the new password. <br>__Expected result__: no error, re-login with new password should succeed. <br>__Result__: no error, re-login with new password succeed. | This is an exceptional behavior, we kept what worked right working right.
-5 | __Third case__: only fill the new password field (without filling new password verify field) with a valid password, then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
-6 | __Third case__: only fill the verify new password field (without filling new password field) with a valid password, then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
-7 | __Third case__: fill the new password field with a valid password while fill the new password verify field a different valid password, then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
-8 | __Third case__: fill the two new password fields with an invalid password ("111" too short), then submit the form. <br>__Expected result__: should receive error. <br>__Result__: receive error. | This is an exceptional behavior, we kept validation working right.
-
-__Time Spent: 20 mins__  
-__Recorder: Shane Qi__
-
-## Timing
-
-Phase Name | Time (minutes)
----|---
-Concept Location | 120
-Impact Analysis | 120
-Prefactoring | 10
-Actualization | 30
-Postfactoring | 10
-Validation | 20
-Total | 310
-
-__Recording Time Included__
-
-## Reverse engineering
-
-### Class Diagram
-
-![](class-diagram.png)
-
-### Sequence Diagram
-
-![](sequence-diagram.png)
-
-## Conclusions
-
-For this change, concept location took us a lot time. I think it's not bad spending more time in any phase, but I think we should delay doing some stuff to the second phase. For example, we don't have to dig very deep in the concept location phase, since we will do such thing more comprehensive in the impact analysis phase (estimate impact set).  
-Concept location and impact analysis was completed mainly with find tool within the IDE such as search keywords and search class usage in the whole project.  
-As we recored in the first step of Validation phase, there isn't a configured unit test environment for this project, so we just manually tested bug fixing from front end. In order to make is more reliable, we did a lot comprehensive tests. Since the change is a minor one, we think those tests are sufficient.
-
-Classes and methods changed:
-- `./app/femr/ui/models/admin/users/EditViewModel/EditViewModel.validate()`
