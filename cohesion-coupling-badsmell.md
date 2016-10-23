@@ -44,3 +44,26 @@ The class's cohesion is __information cohesion__. This class performs six action
 ### DIFF
 
 In the case of our analysis, high-cohesion classes have attributes. And actions in the class share attributes. Attributes are shared data. While low-cohesion classes don't have attributes, their actions are neither sharing data, nor invoking each other a lot. Because those low-cohesion classes' actions are either functional unrelated or not associated.
+
+## Bad Smell
+
+### Internal Duplicate
+
+#### `ResearchService.java`
+
+This class is flagged with internal duplicate smell because these 3 methods have duplication code with each other:
+
+- `buildVitalResultSet(List encounters, ResearchFilterItem filters): ResearchResultSetItem`
+- `buildHeightResultSet(List encounters, ResearchFilterItem filters): ResearchResultSetItem`
+- `buildAgeResultSet(List encounters, ResearchFilterItem filters): ResearchResultSetItem`
+
+I agree that this detected smell is an actual smell. The duplicated code can be merged to another methods and place calls for the new method in both places. Merging duplicate code simplifies the structure of your code and makes it shorter.
+
+#### `SearchService.java`
+
+This class is flagged with internal duplicate smell because these 2 methods have duplication code with each other:
+
+- `retrievePatientsForSearch(Integer tripId): ServiceResponse`
+- `retrievePatientsFromQueryString(String patientSearchQuery): ServiceResponse`
+
+I agree that this detected smell is an actual smell. The duplicated code can be merged to another methods and place calls for the new method in both places. Merging duplicate code simplifies the structure of your code and makes it shorter.
