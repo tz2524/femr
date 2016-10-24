@@ -151,10 +151,11 @@ Same issue for createNewTrip( ). This method is looking for even more String typ
 ![](./Message-chain-1.png)
 It is terrible when the code goes out of my screen, which makes the code reviewing and understanding extremely hard.
 
-Our suggestion is to design new methdods under the missionTrip class, and replace the message chains by called these methods:
-
+Our suggestion is to design new methdods under the missionTrip class, and replace the message chains by called these methods.
+For instance:
 ![](./Message-chain-2.png)
-which simply allows the missionTrip object itself to get the cityName directly thus the developer does not need to create such a long and confusing chain to access the cityName. Also, another benefit of this solution will be introduced when some part of the message chain gets modified, i.e. if the method named `getName` is renamed to `getTheName` for some reason, we used to changed all the `getName` in message chain to `getTheName`, but by the new solution, we only need to do the modification inside the newly designed methods. This saved a lot of time and work load.
+
+which simply allows the missionTrip object itself to get the cityName directly thus the developer does not need to create such a long and confusing chain to access the cityName. Also, another benefit of this solution will be introduced when some part of the message chain gets modified, i.e. if the method named `getName` is renamed to `getTheName` for some reason, we used to changed all the `getName` in message chain to `getTheName`, but by the new solution, we only need to do the modification inside the newly designed methods e.g. `getMissionCityName( )`. This saves a lot of time and work load.
 
 ### Data Class
 
