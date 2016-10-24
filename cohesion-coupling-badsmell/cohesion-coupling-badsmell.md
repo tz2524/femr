@@ -139,3 +139,30 @@ The following picture picts the diff between the two methods. There are 6 lines 
 ![](./internal-duplicate-2.png)
 
 About the question whether this smell is an actual smell, our opinion is neutral. Duplication of 6 lines of code is objective. But it's so minor that not merging them is also acceptable. Since merging duplicate code doesn't hurts anything, we can also say it's an actual smell.
+
+
+### Message chain
+
+#### `createMissionTripItem(IMissionTrip missionTrip) : MissionTripItem` from `ItemModelMapper.java` class
+
+For the createMissionTripItem, we noticed that there is a message chain of objects which is caused by one object which is trying to access another object that is also using an object to access the fourth object. There are 4 objects in total, including City, Country, String(city name) and missionTripItem which starts the call. We agree with the diagnosis since the long code does confuse us and our suggestion to improve it is to separate it into smaller chains or add a specific method to do this kind of work
+
+#### `createNewTrip(TripItem tripItem) : ServiceResponse` from `MissionTripService.java` class
+
+Same issue for createNewTrip(). This method is looking for even more String type data, which are accessed by running message chains, as the input parameters for setting response object. Most of data are logically related to the missionTrip, e.g. the city object of the mission trip, the country object of the mission trip, etc. But the multiple uses of message chains are redundant and confusing to us. Thus we agree with the diagnosis.
+
+It is terrible when the code goes out of my screen, which makes the code reviewing and understanding extremely hard.
+
+Our suggestion is to design a new methdod like:
+
+which requires missinoTrip as the input and output
+
+### Data Class
+
+#### `PatientItem.java` 
+`PatientItem` is a typical data class type bad smell since it is simply a data container which has no functionality other than setters and getters. The diagnosis says it "exposed a significant amount of data in public interface", we partially agree with it but would like to __ignore this flaw__ since it is inevitable to have this class here protecting the patients’ privacy and providing a medium which passes data to other classes/packages. The private data fields of the certain patient’s information and the corresponding getter methods are the the safe guard for the data security. Thus we have no recommendation on how to improve this method.
+
+#### `EditViewModel.java` 
+In our analysis summary, there are 71 classes having the Data Class bad smell. Most of them look the same or have the same structure like `PatientItem.java`, except `EditViewModel.java`. `EditViewModel.java` is also marked as a `severity level 2 Data Class`, however, it does have other utility other than those getters and setters.
+
+It does have the `validate` method which checks if each data feild meets its corresponding requirement, once there is any exception, it would prompt the user to modify the data he or she has just entered. Thus this class obviously has not only data storing utlity but also condition checking functionality, which makes it not a Data Class type class.
