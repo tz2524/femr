@@ -167,6 +167,4 @@ In our analysis summary, there are 71 classes having the Data Class bad smell. M
 ![](./Data-class-1.png)
 It does have a `validate` method which checks if each data feild meets its corresponding requirement, once there is any exception, it would prompt the user to modify the data he or she has just entered. Thus this class obviously has not only data storing utlity but also the condition-checking functionality, which makes it out of the definition of a Data Class bad smell.
 Thus we disagree with the result from InCode and would like to __ignore__ this smell.
-The following picture picts the diff between the two methods. There are 6 lines of code is duplicated in both files.
 
-![](./internal-duplicate-2.png)
