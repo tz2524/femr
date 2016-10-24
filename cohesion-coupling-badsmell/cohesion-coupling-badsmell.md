@@ -134,35 +134,39 @@ This class is flagged with internal duplicate smell because these 2 methods have
 - `retrievePatientsForSearch(Integer tripId): ServiceResponse`
 - `retrievePatientsFromQueryString(String patientSearchQuery): ServiceResponse`
 
-The following picture picts the diff between the two methods. There are 6 lines of code is duplicated in both files.
-
-![](./internal-duplicate-2.png)
 
 About the question whether this smell is an actual smell, our opinion is neutral. Duplication of 6 lines of code is objective. But it's so minor that not merging them is also acceptable. Since merging duplicate code doesn't hurts anything, we can also say it's an actual smell.
 
 
 ### Message chain
 
-#### `createMissionTripItem(IMissionTrip missionTrip) : MissionTripItem` from `ItemModelMapper.java` class
+#### `createMissionTripItem(IMissionTrip missionTrip)` from `ItemModelMapper.java` class
 
-For the createMissionTripItem, we noticed that there is a message chain of objects which is caused by one object which is trying to access another object that is also using an object to access the fourth object. There are 4 objects in total, including City, Country, String(city name) and missionTripItem which starts the call. We agree with the diagnosis since the long code does confuse us and our suggestion to improve it is to separate it into smaller chains or add a specific method to do this kind of work
+For the createMissionTripItem( ), we noticed that there is a message chain of objects which is caused by one object which is trying to access another object that is also using an object to access the fourth object. There are 4 objects in total, including City, Country, String(city name) and missionTripItem which starts the call. We agree with the diagnosis since the long code does confuse us and our suggestion to improve is to separate it into smaller chains (step by step) or add a specific method to do this kind of work.
 
-#### `createNewTrip(TripItem tripItem) : ServiceResponse` from `MissionTripService.java` class
+#### `createNewTrip(TripItem tripItem)` from `MissionTripService.java` class
 
-Same issue for createNewTrip(). This method is looking for even more String type data, which are accessed by running message chains, as the input parameters for setting response object. Most of data are logically related to the missionTrip, e.g. the city object of the mission trip, the country object of the mission trip, etc. But the multiple uses of message chains are redundant and confusing to us. Thus we agree with the diagnosis.
+Same issue for createNewTrip( ). This method is looking for even more String type data, which are accessed by running message chains, as the input parameters for setting response object. Most of data are logically related to the missionTrip, e.g. the city object of the mission trip, the country object of the mission trip, etc. But the multiple uses of message chains are redundant and confusing to us. Thus we agree with the diagnosis.
 
+![](./Message-chain-1.png)
 It is terrible when the code goes out of my screen, which makes the code reviewing and understanding extremely hard.
 
-Our suggestion is to design a new methdod like:
+Our suggestion is to design new methdods under the missionTrip class, and replace the message chains by called these methods:
 
-which requires missinoTrip as the input and output
+![](./Message-chain-2.png)
+which simply allows the missionTrip object itself to get the cityName directly thus the developer does not need to create such a long and confusing chain to access the cityName. Also, another benefit of this solution will be introduced when some part of the message chain gets modified, i.e. if the method named `getName` is renamed to `getTheName` for some reason, we used to changed all the `getName` in message chain to `getTheName`, but by the new solution, we only need to do the modification inside the newly designed methods. This saved a lot of time and work load.
 
 ### Data Class
 
 #### `PatientItem.java` 
-`PatientItem` is a typical data class type bad smell since it is simply a data container which has no functionality other than setters and getters. The diagnosis says it "exposed a significant amount of data in public interface", we partially agree with it but would like to __ignore this flaw__ since it is inevitable to have this class here protecting the patients’ privacy and providing a medium which passes data to other classes/packages. The private data fields of the certain patient’s information and the corresponding getter methods are the the safe guard for the data security. Thus we have no recommendation on how to improve this method.
+`PatientItem` is a typical data class type bad smell since it is simply a data container which has no functionality other than setters and getters. The diagnosis says it "exposed a significant amount of data in public interface", we partially agree with it but would like to __ignore this flaw__ since it is inevitable to have this class here protecting the patients’ privacy and providing a medium which passes data to other classes/packages. The private data fields of the certain patient’s information and the corresponding getter methods are the the safe guard for the data security. Thus we have no recommendation on how to improve this method since it is supposed to be like this.
 
 #### `EditViewModel.java` 
 In our analysis summary, there are 71 classes having the Data Class bad smell. Most of them look the same or have the same structure like `PatientItem.java`, except `EditViewModel.java`. `EditViewModel.java` is also marked as a `severity level 2 Data Class`, however, it does have other utility other than those getters and setters.
 
-It does have the `validate` method which checks if each data feild meets its corresponding requirement, once there is any exception, it would prompt the user to modify the data he or she has just entered. Thus this class obviously has not only data storing utlity but also condition checking functionality, which makes it not a Data Class type class.
+![](./Data-class-1.png)
+It does have a `validate` method which checks if each data feild meets its corresponding requirement, once there is any exception, it would prompt the user to modify the data he or she has just entered. Thus this class obviously has not only data storing utlity but also the condition-checking functionality, which makes it out of the definition of a Data Class bad smell.
+Thus we disagree with the result from InCode and would like to __ignore__ this smell.
+The following picture picts the diff between the two methods. There are 6 lines of code is duplicated in both files.
+
+![](./internal-duplicate-2.png)
