@@ -57,6 +57,10 @@ This class is flagged with internal duplicate smell because these 3 methods have
 - `buildHeightResultSet(List encounters, ResearchFilterItem filters): ResearchResultSetItem`
 - `buildAgeResultSet(List encounters, ResearchFilterItem filters): ResearchResultSetItem`
 
+For example, the following picture picts the diff between the first and second method. According to which we can see there are several snippets of code are duplicated.
+
+![](./internal-duplicate-1.png)
+
 I agree that this detected smell is an actual smell. The duplicated code can be merged to another methods and place calls for the new method in both places. Merging duplicate code simplifies the structure of your code and makes it shorter.
 
 #### `SearchService.java`
@@ -66,4 +70,8 @@ This class is flagged with internal duplicate smell because these 2 methods have
 - `retrievePatientsForSearch(Integer tripId): ServiceResponse`
 - `retrievePatientsFromQueryString(String patientSearchQuery): ServiceResponse`
 
-I agree that this detected smell is an actual smell. The duplicated code can be merged to another methods and place calls for the new method in both places. Merging duplicate code simplifies the structure of your code and makes it shorter.
+The following picture picts the diff between the two methods. There are 6 lines of code is duplicated in both files.
+
+![](./internal-duplicate-2.png)
+
+About the question whether this smell is an actual smell, our opinion is neutral. Duplication of 6 lines of code is objective. But it's so minor that not merging them is also acceptable. Since merging duplicate code doesn't hurts anything, we can also say it's an actual smell.
