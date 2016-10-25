@@ -12,7 +12,7 @@ According to the metric and our analysis, we got the two class with lowest cohes
 
 #### `ItemModelMapper.java` (LCOM5: 16)
 
-This class doesn’t have any attribute, but 18 methods. Among the 18 methods, there are only two pairs of methods having invocation relationship, thus the ratio implies this class must have a low ratio. By definition, the LCOM5 value of this class is calculated as 16 [`18 + (1 - 2) + (1 - 2)`], same as the result of SourceMeter.
+This class doesn’t have any attribute, but 18 methods. Among the 18 methods, there are only two pairs of methods having invocation relationship, thus the ratio implies this class must have a low cohesion. By definition, the LCOM5 value of this class is calculated as 16 [`18 + (1 - 2) + (1 - 2)`], same as the result of SourceMeter.
 
 This class's cohesion is __logical cohesion__. This class performs a series of creation actions. While all creation methods create different type of object. They only map the parameters values onto the new-created object.
 
@@ -38,7 +38,7 @@ This class's cohesion is __information cohesion__. This class performs four acti
 
 #### `UsersController.java` (LCOM5: 1)
 
-This class has 6 attributes, and 7 methods. All the 7 methods are connected because they share the attributes.
+This class has 6 attributes, and 7 methods. All the 7 methods are connected because they share the attributes, thus the cohesion of this class is considered very high..
 
 The class's cohesion is __information cohesion__. This class performs six actions, each of which has its own entry point and independent code. While all actions are related to users' information, they share `missionTripService` .`sessionService`, `userService` and `roleService`.
 
@@ -64,7 +64,7 @@ We used the dependencies analysis tool of IDE, having the result:
 
 ![](coupling-1.png)
 
-This class depends on 38 internal classes, which means its CBO value is 38, same as the result of SourceMeter.
+This class depends on 38 internal classes, which means its CBO value is 38 and this class has high coupling with other classes, same as the result of SourceMeter.
 
 Among the 38 depended classes, 35 of them are model class. `ItemModelMapper` only call their constructors and getter/setters. We think the coupling between `ItemModelMapper` and those model class is __data coupling__ as only required data is passed.
 
@@ -76,7 +76,7 @@ We used the dependencies analysis tool of IDE, having the result:
 
 ![](coupling-2.png)
 
-This class depends on 37 internal classes, which means its CBO value is 37, while CBO result of SourceMeter is 35.
+This class depends on 37 internal classes, which means its CBO value is 37 and this class has high coupling with other classes, while CBO result of SourceMeter is 35.
 
 Among the 37 depended classes, most are model classes, and `SearchService` class directly references the content of those model classes. These coupling is __content coupling__.
 
@@ -90,7 +90,7 @@ We used the dependencies analysis tool of IDE, having the result:
 
 ![](coupling-3.png)
 
-This class depends on none of internal class, which means it's CBO value is 0, same as the result of SourceMeter.
+This class depends on none of internal class, which means it's CBO value is 0 and this class has little coupling with other classes, same as the result of SourceMeter.
 
 For those which is coupled with `GsonFlattener`, the coupling should be __data coupling__, only required data is passed into this class.
 
@@ -100,7 +100,7 @@ We used the dependencies analysis tool of IDE, having the result:
 
 ![](coupling-4.png)
 
-This class depends on 2 internal classes, which means it's CBO value is 2, while CBO result of SourceMeter is 0.
+This class depends on 2 internal classes, which means it's CBO value is 2 and this class has little coupling with other classes, while CBO result of SourceMeter is 0.
 
 For those which is coupled with `GsonFlattener`, the coupling should be __control coupling__, this class explicitly controls the logic of others.
 
