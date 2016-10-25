@@ -1,3 +1,8 @@
+# Group 1
+
+`zxq150130` Shane Qi   
+`txz150730` Tianxiang Zhang
+
 ## Cohesion
 
 There is only one cohesion metric, `LCOM5`, shown in the report.
