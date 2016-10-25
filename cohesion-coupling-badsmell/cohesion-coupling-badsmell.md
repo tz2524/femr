@@ -12,13 +12,13 @@ According to the metric and our analysis, we got the two class with lowest cohes
 
 #### `ItemModelMapper.java` (LCOM5: 16)
 
-This class doesn’t have any attribute, and has 18 methods. Among the 18 methods, there are only two pairs of methods have invocation relationship. So the LCOM5 value of this class is calculated as 16 [`18 + (1 - 2) + (1 - 2)`], same as the result of SourceMeter.
+This class doesn’t have any attribute, but 18 methods. Among the 18 methods, there are only two pairs of methods having invocation relationship, thus the ratio implies this class must have a low ratio. By definition, the LCOM5 value of this class is calculated as 16 [`18 + (1 - 2) + (1 - 2)`], same as the result of SourceMeter.
 
 This class's cohesion is __logical cohesion__. This class performs a series of creation actions. While all creation methods create different type of object. They only map the parameters values onto the new-created object.
 
 #### `StringUtils.java` (LCOM5: 9)
 
-This class doesn’t have any attribute, and has 12 methods. Among the 12 methods, there is one method invoked by another three methods. The rest of methods don't have relationship to each other. So the LCOM5 value of this class is calculated as 9 [`12 + (1 - 4)`], same as the result of SourceMeter.
+This class doesn’t have any attribute, but 12 methods. Among the 12 methods, there is one method invoked by another three methods. The rest of methods are not related to each other, and the independency of those methods implies that this method might have a low cohesion. The LCOM5 value of this class is calculated as 9 [`12 + (1 - 4)`], same as the result of SourceMeter.
 
 This class's cohesion is __coincidental cohesion__. Although methods of this class are all about Strings, they are unrelated. Some methods format other type to String, while some methods just combine several Strings with a format, and some methods validate the input String and return Bool value.
 
@@ -26,12 +26,13 @@ This class's cohesion is __coincidental cohesion__. Although methods of this cla
 
 By same rationale, we started searching for the highest cohesion by ascending order of these classes’ LCOM5 value. And then we noticed that there are many classes whose LCOM5 is 0 because they have only setter, getters, etc. So we skipped them as well as other trivial classes who have only one method inside.
 
-Also, we skipped some exceptions during the mountain climb. For example, we skipped TriageController.java since we noticed that there are two records (TriageController and TriageControlle$1) pointing to the same class TriageController.java while these two records are having different stats on it. Another case is the AllowedRolesAction.java class. The LCOM5 given is 1 while we got 2 after the analysis thus we skipped it.
-After the filter, we got the highest two: `TabController.java` and `UsersController.java`.
+Also, we skipped some exceptions during the mountain-climb. For example, we skipped `TriageController.java` since we noticed that there are two records (TriageController and TriageControlle$1) pointing to the same class `TriageController.java` while these two records are having different stats on it. Another case is the `AllowedRolesAction.java` class. The LCOM5 given is 1 while we got 2 after the analysis thus we skipped it.
+
+After running the filter, we got the highest two: `TabController.java` and `UsersController.java`.
 
 #### `TabController.java` (LCOM5: 1)
 
-This class has 4 attributes, and 4 methods. All the 4 methods share the attribute `tabService`, which means LCOM5 value of this class is 1.
+This class has 4 attributes, and 4 methods. All the 4 methods share the attribute `tabService`, which means LCOM5 value of this class is 1. All the methods are closely related thus the cohesion of this class is considered very high.
 
 This class's cohesion is __information cohesion__. This class performs four actions, each of which has its own entry point and independent code. While all actions shared `sessionService` and `tabService`. The two shared attributes are shared data. Essentially, this is an abstract data type.
 
@@ -63,7 +64,7 @@ We used the dependencies analysis tool of IDE, having the result:
 
 ![](coupling-1.png)
 
-This class depends on 38 internal classes, which means it's CBO value is 38, same as the result of SourceMeter.
+This class depends on 38 internal classes, which means its CBO value is 38, same as the result of SourceMeter.
 
 Among the 38 depended classes, 35 of them are model class. `ItemModelMapper` only call their constructors and getter/setters. We think the coupling between `ItemModelMapper` and those model class is __data coupling__ as only required data is passed.
 
@@ -75,7 +76,7 @@ We used the dependencies analysis tool of IDE, having the result:
 
 ![](coupling-2.png)
 
-This class depends on 37 internal classes, which means it's CBO value is 37, while CBO result of SourceMeter is 35.
+This class depends on 37 internal classes, which means its CBO value is 37, while CBO result of SourceMeter is 35.
 
 Among the 37 depended classes, most are model classes, and `SearchService` class directly references the content of those model classes. These coupling is __content coupling__.
 
@@ -144,7 +145,7 @@ About the question whether this smell is an actual smell, our opinion is neutral
 
 #### `createMissionTripItem(IMissionTrip missionTrip)` from `ItemModelMapper.java` class
 
-For the createMissionTripItem( ), we noticed that there is a message chain of objects which is caused by one object which is trying to access another object that is also using an object to access the fourth object. There are 4 objects in total, including City, Country, String(city name) and missionTripItem which starts the call. We agree with the diagnosis since the long code does confuse us and our suggestion to improve is to separate it into smaller chains (step by step) or add a specific method to do this kind of work.
+For the `createMissionTripItem( )`, we noticed that there is a message chain of objects which is caused by one object which is trying to access another object that is also using an object to access the fourth object. There are 4 objects in total, including City, Country, String(city name) and missionTripItem which starts the call. We agree with the diagnosis since the long code does confuse us and our suggestion to improve is to separate it into smaller chains (step by step) or add a specific method to do this kind of work.
 
 #### `createNewTrip(TripItem tripItem)` from `MissionTripService.java` class
 
@@ -171,6 +172,6 @@ In our analysis summary, there are 71 classes having the Data Class bad smell. M
 
 ![](./Data-class-1.png)
 
-It does have a `validate` method which checks if each data feild meets its corresponding requirement, once there is any exception, it would prompt the user to modify the data he or she has just entered. Thus this class obviously has not only data storing utlity but also the condition-checking functionality, which makes it out of the definition of a Data Class bad smell.
+It does have a `validate( )` method which checks if each data feild meets its corresponding requirement, once there is any exception, it would prompt the user to modify the data he or she has just entered. Thus this class obviously has not only data storing utlity but also the condition-checking functionality, which makes it out of the definition of a Data Class bad smell.
 Thus we disagree with the result from InCode and would like to __ignore__ this smell.
 
