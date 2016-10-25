@@ -134,6 +134,7 @@ This class is flagged with internal duplicate smell because these 2 methods have
 - `retrievePatientsForSearch(Integer tripId): ServiceResponse`
 - `retrievePatientsFromQueryString(String patientSearchQuery): ServiceResponse`
 
+![](./internal-duplicate-2.png)
 
 About the question whether this smell is an actual smell, our opinion is neutral. Duplication of 6 lines of code is objective. But it's so minor that not merging them is also acceptable. Since merging duplicate code doesn't hurts anything, we can also say it's an actual smell.
 
