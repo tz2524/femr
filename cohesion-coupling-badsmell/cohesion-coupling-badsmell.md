@@ -134,10 +134,11 @@ This class is flagged with internal duplicate smell because these 2 methods have
 - `retrievePatientsForSearch(Integer tripId): ServiceResponse`
 - `retrievePatientsFromQueryString(String patientSearchQuery): ServiceResponse`
 
+The following picture picts the diff between the two methods. There are 6 lines of code is duplicated in both files.		
+
 ![](./internal-duplicate-2.png)
 
 About the question whether this smell is an actual smell, our opinion is neutral. Duplication of 6 lines of code is objective. But it's so minor that not merging them is also acceptable. Since merging duplicate code doesn't hurts anything, we can also say it's an actual smell.
-
 
 ### Message chain
 
@@ -150,10 +151,12 @@ For the createMissionTripItem( ), we noticed that there is a message chain of ob
 Same issue for createNewTrip( ). This method is looking for even more String type data, which are accessed by running message chains, as the input parameters for setting response object. Most of data are logically related to the missionTrip, e.g. the city object of the mission trip, the country object of the mission trip, etc. But the multiple uses of message chains are redundant and confusing to us. Thus we agree with the diagnosis.
 
 ![](./Message-chain-1.png)
+
 It is terrible when the code goes out of my screen, which makes the code reviewing and understanding extremely hard.
 
 Our suggestion is to design new methdods under the missionTrip class, and replace the message chains by called these methods.
 For instance:
+
 ![](./Message-chain-2.png)
 
 which simply allows the missionTrip object itself to get the cityName directly thus the developer does not need to create such a long and confusing chain to access the cityName. Also, another benefit of this solution will be introduced when some part of the message chain gets modified, i.e. if the method named `getName` is renamed to `getTheName` for some reason, we used to changed all the `getName` in message chain to `getTheName`, but by the new solution, we only need to do the modification inside the newly designed methods e.g. `getMissionCityName( )`. This saves a lot of time and work load.
@@ -167,6 +170,7 @@ which simply allows the missionTrip object itself to get the cityName directly t
 In our analysis summary, there are 71 classes having the Data Class bad smell. Most of them look the same or have the same structure like `PatientItem.java`, except `EditViewModel.java`. `EditViewModel.java` is also marked as a `severity level 2 Data Class`, however, it does have other utility other than those getters and setters.
 
 ![](./Data-class-1.png)
+
 It does have a `validate` method which checks if each data feild meets its corresponding requirement, once there is any exception, it would prompt the user to modify the data he or she has just entered. Thus this class obviously has not only data storing utlity but also the condition-checking functionality, which makes it out of the definition of a Data Class bad smell.
 Thus we disagree with the result from InCode and would like to __ignore__ this smell.
 
