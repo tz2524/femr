@@ -552,4 +552,45 @@ public class MedicationService implements IMedicationService {
         return response;
     }
 
+    @Override
+    public ServiceResponse<List<String>> retrieveAllMedications() {
+        ServiceResponse<List<String>> response = new ServiceResponse<>();
+
+        try {
+            List<String> medicationNames = new ArrayList<>();
+
+            Query<Medication> medicationQuery = QueryProvider.getMedicationQuery()
+                    .where()
+                    .eq("isDeleted", false).orderBy("name");
+            List<? extends IMedication> medications = medicationQuery.findList();
+
+            for (IMedication m : medications) {
+                medicationNames.add(m.getName());
+            }
+            response.setResponseObject(medicationNames);
+        } catch (Exception ex) {
+            response.addError("exception", ex.getMessage());
+        }
+
+        return response;
+    }
+
+    @Override
+    public ServiceResponse<MedicationItem> removeMedication(int medicationID) {
+        ServiceResponse<MedicationItem> response = new ServiceResponse<>();
+        try{
+
+            // Find one medication (should only be 1 with the ID) from the database
+            IMedication  medication = medicationRepository.findOne(medicationID);
+
+            medicationRepository.delete(medication);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            response.addError("exception", ex.getMessage());
+        }
+
+        return response;
+    }
+
 }

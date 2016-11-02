@@ -5,6 +5,7 @@ import com.avaje.ebean.Query;
 import com.google.inject.Inject;
 import femr.business.helpers.QueryProvider;
 import femr.data.IDataModelMapper;
+import femr.data.daos.Repository;
 import femr.data.daos.core.IMedicationRepository;
 import femr.data.models.core.*;
 import femr.data.models.mysql.Medication;
@@ -177,6 +178,23 @@ public class MedicationRepository implements IMedicationRepository {
         List<? extends IMedication> medications = medicationQuery.findList();
 
         return medications;
+    }
+
+    @Override
+    public IMedication findOne(int medicationID) {
+        ExpressionList<Medication> medicationQuery = QueryProvider.getMedicationQuery()
+                .where()
+                .eq("id", medicationID);
+
+        IMedication medication = medicationQuery.findUnique();
+
+        return medication;
+    }
+
+    @Override
+    public void delete(IMedication medication) {
+        Repository<IMedication> rep =new Repository<>();
+        rep.delete(medication);
     }
 
 }

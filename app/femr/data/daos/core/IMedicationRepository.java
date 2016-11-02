@@ -56,5 +56,9 @@ public interface IMedicationRepository {
      * @return
      */
     List<? extends IMedication> retrieveAllMedicationByTripId(Integer tripId);
+
+    IMedication findOne(int medicationID);
+
+    void delete(IMedication medication);
 }
 
