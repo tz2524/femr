@@ -55,42 +55,6 @@ public class LocaleUnitConverter {
         return vitalMap;
     }
 
-
-    /**
-     * Converts all imperial values in a PatientItem to metric values
-     * @param patient PatientItem to get imperial values from and store metric values into
-     * @return PatientItem with metric values
-     */
-    public static PatientItem toMetric(PatientItem patient) {
-        if (patient == null) return patient;
-
-        // Store seperate height variables temporarily
-        // Wish getHeightFeet() and getHeightInches() were'nt stored as Integer in PatientItem.
-        // Causes issues with precision when value stored in database as a non whole number
-        if (patient.getHeightFeet() != null && patient.getHeightInches() != null) {
-            Integer feet = patient.getHeightFeet();
-            Integer inches = patient.getHeightInches();
-
-            //added for femr-136 - dulal unit display
-            patient.setHeightFeetDual(patient.getHeightFeet());
-            patient.setHeightInchesDual(patient.getHeightInches());
-
-            // Overwrite patient height feet with meters
-            patient.setHeightFeet(LocaleUnitConverter.getMeters(feet, inches));
-
-            // Overwrite patient height inches with centimeters
-            patient.setHeightInches(LocaleUnitConverter.getCentimetres(feet, inches));
-        }
-
-        // Overwrite patients weight with kg
-        if (patient.getWeight() != null) {
-            patient.setWeight(LocaleUnitConverter.getKgs(patient.getWeight()).floatValue());
-            //added for femr-136 - dual unit display
-            patient.setWeightDual(LocaleUnitConverter.getLbs(patient.getWeight()));
-        }
-        return patient;
-    }
-
     /**
      * Added for femr-136 - dual unit display
      * Converts all imperial values in a PatientItem to metric values for dual unit display
