@@ -18,6 +18,8 @@
 */
 package femr.common.models;
 
+import femr.util.calculations.LocaleUnitConverter;
+
 import java.util.Date;
 
 public class PatientItem {
@@ -220,4 +222,32 @@ public class PatientItem {
     public void setMonthsOld(Integer monthsOld) {
         this.monthsOld = monthsOld;
     }
+
+    public void toMetric() {
+        // Store seperate height variables temporarily
+        // Wish getHeightFeet() and getHeightInches() were'nt stored as Integer in PatientItem.
+        // Causes issues with precision when value stored in database as a non whole number
+        if (heightFeet != null && heightInches != null) {
+            Integer feet = heightFeet;
+            Integer inches = heightInches;
+
+            //added for femr-136 - dulal unit display
+            setHeightFeetDual(heightFeet);
+            setHeightInchesDual(heightInches);
+
+            // Overwrite patient height feet with meters
+            setHeightFeet(LocaleUnitConverter.getMeters(feet, inches));
+
+            // Overwrite patient height inches with centimeters
+            setHeightInches(LocaleUnitConverter.getCentimetres(feet, inches));
+        }
+
+        // Overwrite patients weight with kg
+        if (weight != null) {
+            setWeight(LocaleUnitConverter.getKgs(weight).floatValue());
+            //added for femr-136 - dual unit display
+            setWeightDual(LocaleUnitConverter.getLbs(weight));
+        }
+    }
+
 }

@@ -142,7 +142,7 @@ public class SearchService implements ISearchService {
 
             // If metric setting enabled convert response patientItem to metric
             if (isMetric()){
-                patientItem = LocaleUnitConverter.toMetric(patientItem);
+                patientItem.toMetric();
             }else {
                //added for femr-136 - dual unit display
                 patientItem = LocaleUnitConverter.forDualUnitDisplay(patientItem);
@@ -210,7 +210,7 @@ public class SearchService implements ISearchService {
 
             // If metric setting enabled convert response patientItem to metric
             if (isMetric())
-                patientItem = LocaleUnitConverter.toMetric(patientItem);
+                patientItem.toMetric();
 
             response.setResponseObject(patientItem);
         } catch (Exception ex) {
