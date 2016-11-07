@@ -394,7 +394,10 @@ public class MissionTripService implements IMissionTripService {
 
                     IMissionTrip missionTrip = dataModelMapper.createMissionTrip(tripItem.getTripStartDate(), tripItem.getTripEndDate(), missionCity, missionTeam);
                     missionTrip = missionTripRepository.create(missionTrip);
-                    response.setResponseObject(itemModelMapper.createTripItem(missionTrip.getMissionTeam().getName(), missionTrip.getMissionCity().getName(), missionTrip.getMissionCity().getMissionCountry().getName(), missionTrip.getStartDate(), missionTrip.getEndDate()));
+                    IMissionTeam theMissionTeamBuffer = returnMissionTeam(missionTrip);
+                    IMissionCity theMissionCityBuffer = returnMissionCity(missionTrip);
+                    IMissionCountry theMissionCountryBuffer = theMissionCityBuffer.getMissionCountry();
+                    response.setResponseObject(itemModelMapper.createTripItem(theMissionTeamBuffer.getName(), theMissionCityBuffer.getName(), theMissionCountryBuffer.getName(), missionTrip.getStartDate(), missionTrip.getEndDate()));
 
                 }
             } catch (Exception ex) {
@@ -406,6 +409,19 @@ public class MissionTripService implements IMissionTripService {
         return response;
     }
 
+    public IMissionTeam returnMissionTeam(IMissionTrip MT){
+
+        return MT.getMissionTeam();
+
+
+    }
+
+    public IMissionCity returnMissionCity(IMissionTrip MT){
+
+        return MT.getMissionCity();
+
+
+    }
     /**
      * {@inheritDoc}
      */

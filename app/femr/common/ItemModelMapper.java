@@ -137,21 +137,34 @@ public class ItemModelMapper implements IItemModelMapper {
 
         MissionTripItem missionTripItem = new MissionTripItem();
         missionTripItem.setId(missionTrip.getId());
-        if (missionTrip.getMissionCity() != null)
-            missionTripItem.setTripCity(missionTrip.getMissionCity().getName());
-        if (missionTrip.getMissionCity() != null)
-            missionTripItem.setTripCountry(missionTrip.getMissionCity().getMissionCountry().getName());
+        //Extracted tons of message chains to new methods
+        if (getMissionCityObject(missionTrip) != null)
+            missionTripItem.setTripCity(getMissionCityObject(missionTrip).getName());
+        if (getMissionCityObject(missionTrip) != null)
+            missionTripItem.setTripCountry(getMissionCityObject(missionTrip).getMissionCountry().getName());
+        SetMissionTripItemInfo(missionTrip, missionTripItem);
+
+        missionTripItem.setFriendlyTripTitle(
+                getFriendlyTripTitle(missionTripItem)
+        );
+
+        return missionTripItem;
+    }
+
+    public IMissionCity getMissionCityObject(IMissionTrip missionTrip) {
+        return missionTrip.getMissionCity();
+    }
+
+    private void SetMissionTripItemInfo(IMissionTrip missionTrip, MissionTripItem missionTripItem) {
         missionTripItem.setTripStartDate(missionTrip.getStartDate());
         missionTripItem.setFriendlyTripStartDate(dateUtils.getFriendlyDate(missionTrip.getStartDate()));
         missionTripItem.setTripEndDate(missionTrip.getEndDate());
         missionTripItem.setFriendlyTripEndDate(dateUtils.getFriendlyDate(missionTrip.getEndDate()));
         missionTripItem.setTeamName(missionTrip.getMissionTeam().getName());
+    }
 
-        missionTripItem.setFriendlyTripTitle(
-                StringUtils.generateMissionTripTitle(missionTripItem.getTeamName(), missionTripItem.getTripCountry(), missionTripItem.getTripStartDate(), missionTripItem.getTripEndDate())
-        );
-
-        return missionTripItem;
+    private String getFriendlyTripTitle(MissionTripItem missionTripItem) {
+        return StringUtils.generateMissionTripTitle(missionTripItem.getTeamName(), missionTripItem.getTripCountry(), missionTripItem.getTripStartDate(), missionTripItem.getTripEndDate());
     }
 
     /**
