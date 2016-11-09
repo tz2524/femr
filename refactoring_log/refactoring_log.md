@@ -161,14 +161,22 @@ The method used to have too many message chains as parameters to set up its data
 
 
 ## Testing
-
 ### Internal Duplication in `ResearchService.java`
+
+Since the method we refactored is used to fetch different secondary data according to three different secondary data filter, we wrote three test cases to test whether correct secondary data is fetched successfully.
+
+Before refactoring, all test cases passed. Our refactoring only modified private methods which has no impact to our test cases, so that we directly ran test cases after refactoring, and all test cases still passed.
 
 ### Message Chain in `ItemModelMapper.java`
 
 ### Feature Envy in `LocaleUnitConverter.java`
 
+The method we moved is used to convert `PatientItem` object's height from foot/inch to meter/centimeter and convert weight from pound to kilogram, we wrote one test case to make sure the converting is correct.
+
+Before refactoring, the test case passed. Our refactoring moved the public method which means the test case should be modified correspondingly. We modified the test case and ran it right after refactoring, and the test case passed.
+
 ### Message Chain in `MissionTripService.java`
 
-After the refactoring, the only change of the class is the parameter of Response object. It used to have chains as the parameter of TeamName, CoutryName, and CityName and by now it got them by calling new methods which return them.
+After the refactoring, the only change of the class is the parameter of Response object. It used to have chains as the parameter of TeamName, CountryName, and CityName and by now it got them by calling new methods which return them.
+
 We set up a set of test cases to focus on testing the Response object since after the method extracting, the Response object is the only object that has data field changed. In our test cases, we set up the TripItem with Team = Group 1, City = Richardson, Country = USA, start and end dates are 10/1/2016 and 12/31/2016. Then we test the Response object if all the data fields are obtained/called appropriately. As expected, all five test cases passed.
