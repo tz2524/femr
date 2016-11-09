@@ -71,7 +71,10 @@ Use automated refactoring tools from IntelliJ IDE to refactor the code.
 
 #### Rationale:
 
+Feature envy means a method accesses the data of another object more than its own data. In this case, the method didn't accesses any property of `LocaleUnitConverter.java`, every data accessed belongs to object `PatientItem`. So that the treatment should be moving method, which means we should move the mothod from `LocaleUnitConverter.java` to `PatientItem.java`.
+
 #### Steps:
+
 1. We inspected the method `public static PatientItem toMetric(PatientItem patient)`. The problem was that the method accessed the data of a `PatientItem` object a lot.
 
 2. We decided move the operations of the method into `PatientItem.java`.
@@ -158,6 +161,7 @@ The method used to have too many message chains as parameters to set up its data
 
 
 ## Testing
+
 ### Internal Duplication in `ResearchService.java`
 
 ### Message Chain in `ItemModelMapper.java`
@@ -165,5 +169,6 @@ The method used to have too many message chains as parameters to set up its data
 ### Feature Envy in `LocaleUnitConverter.java`
 
 ### Message Chain in `MissionTripService.java`
+
 After the refactoring, the only change of the class is the parameter of Response object. It used to have chains as the parameter of TeamName, CoutryName, and CityName and by now it got them by calling new methods which return them.
 We set up a set of test cases to focus on testing the Response object since after the method extracting, the Response object is the only object that has data field changed. In our test cases, we set up the TripItem with Team = Group 1, City = Richardson, Country = USA, start and end dates are 10/1/2016 and 12/31/2016. Then we test the Response object if all the data fields are obtained/called appropriately. As expected, all five test cases passed.
