@@ -51,7 +51,8 @@ public class ItemModelMapperTest extends BaseTest {
         responseItem.setTripStartDate(MT.getStartDate());
         responseItem.setTripEndDate(MT.getEndDate());
         responseItem.setTripCity(MT.getMissionCity().getName());
-        responseItem.setTripCountry(MT.getMissionCity().getMissionCountry().getName());
+        IMissionCity buffer = MT.getMissionCity();
+        responseItem.setTripCountry(buffer.getMissionCountry().getName());
         responseItem.setTeamName(MT.getMissionTeam().getName());
     }
 
