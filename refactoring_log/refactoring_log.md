@@ -13,9 +13,13 @@ This class is flagged with internal duplicate smell because these 3 methods have
 `buildHeightResultSet(List encounters, ResearchFilterItem filters): ResearchResultSetItem`  
 `buildAgeResultSet(List encounters, ResearchFilterItem filters): ResearchResultSetItem`  
 
-#### Rationale:
+#### Original Rationale:
+
 Use automated refactoring tool from IntelliJ IDE (Failed to do it automatically). 
-Instead of automation, we do the refactoring manually, and the new rationale is to extract methods.
+
+#### Back-up:
+
+Instead of automation, we do the refactoring manually, and the new rationale is to extract methods which can be called to perform the functionality of the duplicated code.
 
 #### Steps:
 1. We used a diff inspecting tool 'FileMerge' to find out the duplicated code.  
@@ -43,8 +47,8 @@ Instead of automation, we do the refactoring manually, and the new rationale is 
 
 This class is marked as having message chains inside the `createMissionTripItem(IMissionTrip missionTrip)` method.
 
-#### Rationale:
-Use automated refactoring tools from IntelliJ IDE to refactor the code.
+#### Rationale:i
+Use automated refactoring tools from IntelliJ IDE to refactor the code & Use hide delegates to shorter the message chain.
 
 #### Steps:
 1. We checked the code, and figured out that the chain looks like this:
@@ -124,8 +128,14 @@ The method used to have too many message chains as parameters to set up its data
 
 9. Then we run the analysis, the message chain smell is removed.
 
-
-
+## InCode Analysis Before and After
+Before:
+![](./Incode-Before.png)
+After:
+![](./Incode-After.png)
+### Comment: 
+Two message chains are removed; One internal duplication is removed; One feature envy is removed, but for testing reasons, the test cases brought two more feature envy smells. This is inevitable since the testing objects are data fields from external classes. Thus we would like to ignore those two smells in test classes. What's more, after the refactoring, some other smells disappeared for some reason though we did not do it on purpose. E.g. configure() in DataLayerModule.java as an external duplication 
+![](./FE-After.png)
 
 ## Analysis
 
@@ -169,6 +179,10 @@ Before refactoring, all test cases passed. Our refactoring only modified private
 
 ### Message Chain in `ItemModelMapper.java`
 
+First, we looked at the refactored method to see if there is any functionality that we will need to test. And we figured out that the method performs no other functionality but pass data fields from object to object. Thus we decided to test on the output object for its data fields.
+
+The method that has been refactored has MissionTripItem object as the output. Thus we set up a test that builds up the data fields of the MissionTripItem. Then we test if all the data fields can be accessed. As expected, all 5 tests passed.
+
 ### Feature Envy in `LocaleUnitConverter.java`
 
 The method we moved is used to convert `PatientItem` object's height from foot/inch to meter/centimeter and convert weight from pound to kilogram, we wrote one test case to make sure the converting is correct.
@@ -177,6 +191,6 @@ Before refactoring, the test case passed. Our refactoring moved the public metho
 
 ### Message Chain in `MissionTripService.java`
 
-After the refactoring, the only change of the class is the parameter of Response object. It used to have chains as the parameter of TeamName, CountryName, and CityName and by now it got them by calling new methods which return them.
+After the refactoring, the only change of the class was the parameter of Response object. It used to have chains as the parameter of TeamName, CountryName, and CityName and by now it got them by calling new methods which return them.
 
 We set up a set of test cases to focus on testing the Response object since after the method extracting, the Response object is the only object that has data field changed. In our test cases, we set up the TripItem with Team = Group 1, City = Richardson, Country = USA, start and end dates are 10/1/2016 and 12/31/2016. Then we test the Response object if all the data fields are obtained/called appropriately. As expected, all five test cases passed.
