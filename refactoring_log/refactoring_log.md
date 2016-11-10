@@ -75,7 +75,7 @@ Use automated refactoring tools from IntelliJ IDE to refactor the code & Use hid
 
 #### Rationale:
 
-Feature envy means a method accesses the data of another object more than its own data. In this case, the method didn't accesses any property of `LocaleUnitConverter.java`, every data accessed belongs to object `PatientItem`. So that the treatment should be moving method, which means we should move the mothod from `LocaleUnitConverter.java` to `PatientItem.java`.
+Feature envy means a method accesses the data of another object more than its own data. In this case, the method didn't accesses any property of `LocaleUnitConverter.java`, every data accessed belongs to object `PatientItem`. So that the treatment should be moving method, which means we should move the method from `LocaleUnitConverter.java` to `PatientItem.java`.
 
 #### Steps:
 
@@ -116,9 +116,9 @@ The method used to have too many message chains as parameters to set up its data
 
 3. To delegate the objects (e.g. missionCity object delegated for `missionTrip.getMissionCity()`), we created two new methods `returnMissionTeam(IMissionTrip MT)` and `returnMissionCity(IMissionTrip MT)`.
 
-4. For `returnMissionTeam(IMissionTrip MT)`, the methods does not do any comlicated thing but simply return MT.getMissionTeam object.
+4. For `returnMissionTeam(IMissionTrip MT)`, the methods does not do any complicated thing but simply return MT.getMissionTeam object.
 
-5. For `returnMissionCity(IMissionTrip MT)`, the methods does not do any comlicated thing but simply return MT.getMissionCity object.
+5. For `returnMissionCity(IMissionTrip MT)`, the methods does not do any complicated thing but simply return MT.getMissionCity object.
 
 6. Then we replace missionTrip.getMissionTeam() by returnMissionTeam(missionTrip).
 
