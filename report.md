@@ -164,6 +164,29 @@ diff -r -u 0_before/femr/app/femr/ui/views/history/indexEncounter.scala.html 1_a
                                            @for(activeDrug <- prescription.getMedicationActiveDrugs) {
 ```
 
+#### Assessing
+
+Change1 and change2 are pretty similar and straight-forward. These two changes both replace prescription name with a local variable which is a combination of prescription name and prescription amount. Well, they are slightly different because change1 used only one local variable before `if ... else ...` while change2 had two local variables with same value in the `if` and `else` block.
+
+Change3 is different from the other two because it did some more extra changes. Change3 not only added prescription amount, but also added medication form into pdf output. Besides pdf, change3 added prescriptino amount into encounter history web page. And change3 also modified the control flow in `MedicationRepository.java`.
+
+We assumed that these three changes all fixed the issue in the change request, and we have these criteria about the change quality: 
+
+1. How much time the change costs to actualize.
+  - Change1 is straight-forward and only has 3 lines of code changed;
+  - Change2 also costs little and has 4 lines of code changed;
+  - Change3 changed much more lines of code than the other two changes, it definitely costs more time.
+  
+2. The risks of injecting new bugs as a side-effect of the change.
+  - Change1 and change2 is not possible to introduce bug since they didn't make a huge change on the system.
+  - Change2 put more risks on the system because it has more lines of code changed and also changed some control flow.
+  
+3. Whether the change intruduces code bad-smell.
+  - Change1 and change3 are okay, not any bad-smell was introduced.
+  - Change2 has a small problem since it added two same local virable which can be extracted to a single one. This is kind of a code duplication.
+  
+In summary, change1 has the highest quality while change3 has the lowest.
+
 ### FEMR-137: flag birthdays as being accurate or a guess
 
 #### change1
