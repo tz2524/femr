@@ -1039,3 +1039,27 @@ diff -r -u 0_before/femr/public/js/triage/triage.js 1_after/femr/public/js/triag
          }
      });
 ```
+#### Assessing
+
+Based on the fact that the issue itself is very difficult, all the changes are more complex than the ones in first request. Following is the analysis of each change:
+
+Change1 has changes on the front end, it prompts the user to input if the age is real or not and then assign it to the `isAgeReal` variable. The solution is straight forward and simple, however, based on the experience that we had in fixing this issue, they seem like forgot to edit the database as well. So basically it's like they're asking the users to claim if the age is real or not without recording it down. Also, since they have not added the new variables to other related modules, the `isAgeReal` variable will be just simply passed during running time without being processes. Thus the change is trivial in functionality improvement since researchers will never be able to invoke these kind of information from database.
+
+Change2 has the same approach, it adds the flag to indicate if the age is real or not. Unlike change1, the developers of change2 added the flag variable to other modules as well, e.g. `getFakeBDFlag()` and `Integer fakeBDFlag`. By doing this, they made the changed patient object remain consistent data fields across the whole project. Also, in mappers, they added the flag variable as well so that the database won't throw exceptions and the relationship between database and objects is stable. However, like change1, change2 does not have the sql file to updata database column neither. So we doubt if the changed version could take down the flag records and retrive it properly. In addition, not negative though, change3 has many trivial changes like indent, new lines, etc.
+
+Change3 sets a string variable called `ageCalculated` to indicate if the age is calculated by year & month("Yes"), directly entered the exact date("No") or fake("Unknown"). This variable does not solve the fakeBD issue but also makes it possible for reseachers to retrive new categories of information, i.e. people who entered year & month and people who entered exact date. Beside the thing change2 has done, change3 also edits the sql script to add the new column to `patient` table, thus we believe that this change is very comprehensive and successful.
+
+Based on our analysis and criteria which are:
+
+1. Functionality.
+  - Change1: we doubt if it solves the problem;
+  - Change2: we doubt if it solves the problem;
+  - Change3: Beside correctly adding flag, it also adds a column as flag filed in `patient` table, so I believe that it solves the problem
+  
+2. Extensibility.
+  - Change1: the flag is used for checking fakeDB only.
+  - Change2: the flag is used for checking fakeDB only.
+  - Change3: the flag is string type and can be used to check if the DB is fake, exact date, or estimated.
+  
+  
+In summary, change3 has the highest quality, then change2, and change1 has the lowest.
