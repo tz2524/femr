@@ -1,3 +1,78 @@
+# Group 1 Final Project Report
+
+`zxq150130` Shane Qi   
+`txz150730` Tianxiang Zhang
+
+## Part 1
+
+### CC1
+
+#### Step
+1.	We run the terminal on Mac.
+2.	We use the `diff –rp` to compare `0_before` and `1_after` folder. Following is what we’ve got.
+
+![](CC1command.bmp)
+
+3.	We figured out that there are two `.DS_Store` files existing only in 0_before, but they seem like some system files so we are about to skip analyzing them. 
+4.	`pharmacyClientValidation.js` appears only in 1_after\...\femr, i.e. it’s added during the change
+5.	`MedicationRepository.java` and `pharmacyClientValidation.js` (under pharmacy folder) are two files that changed.
+
+#### Analysis and Inference
+1.	`MedicationRepository.java` -- line 149 - 151:
+ We used notepad++ on Windows to check the difference between those two files and realize there is only one section changed as a new if statement is added.
+ 
+ After reading the code, we believe that the change is to fix an existed bug that may return `null` only when name is missing but not when medication strength or medication form is missing, which is considered as a possible case (or less restriction on medication data entry).
+
+2.	`pharmacyClientValidation.js` under pharmacy folder -- line 6 - 11:
+ We looked at both `pharmacyClientValidation.js` under pharmacy folders of before and after. And we notice that the only changed section is a condition statement about if a check box is checked or not. The contained string is about if the disclaimer has been read or not. 
+
+ So we infer that the change is to ask patient or the guardian to check that they have read the disclaimer.
+ 
+3.	`pharmacyClientValidation.js` under femr folder:
+ We check the code with the `pharmacyClientValidation.js` under `pharmacy` folder, and realize that they're identical. An approach to figure out why this file is standing there is to find the connection of the other change to this file. But from the code of previous changed files, we get no clue about what this file is used for under the femr folder, so we believe that it is because the developer who conducted this change forgot to remove it after he/she pasted it there for some reason (easier to edit, etc.).
+
+#### Justification
+To justify our inference for the change of `MedicationRepository.java`, we run the 0_before and 1_after separately with Intelli J IDE. It shows that, under the Medical module, the after version supports to assign a new medication which has name only while the before version would prompt us that there is a run-time exception raised. Then on teamfemr at Atlassian we find that this issue seems like `FEMR-252 Submitting medications causes exception`.
+
+To justify the change of `pharmacyClientValidaition.js`, we run the before and after versions, and it proves our inference since the check box does appear in the after version under the Pharmacy module. Then on teamfemr at Atlassian we know that this issue seems like`FEMR-138 Don't let a user submit on Pharmacy unless they check the disclaimer`.
+
+
+### CC2
+
+#### Step
+1.	We run the terminal on Mac.
+2.	We use the `diff` command with `–rp` as the parameter to compare 0_before and 1_after folder. Following is what we’ve got.
+
+![](CC2command.bmp)
+
+3.	We figured out that there are 5 files changed after the change request. 
+4.	The name of changed files are: `MedicationRepository.java`, `PDFController.java`, `indexEncounter.scala.html`, `treatmentTab.scala.html` and `DatabaseSeeder.java`.
+
+#### Analysis and Inference
+1.	`MedicationRepository.java` -- line 149 - 151:
+ Same like CC1, the change is to make it able to create new medication that has name but strength or form missing. And the solution here is exactly the same like the one in CC1. For inference, justification and more details, please go back to CC1.
+
+2.	`treatmentTab.scala.html` -- line 68 - 70:
+ In order to accurately reflect the data being stored in the object, the developer modified the element_id of the label to "procedure" as well as the text content of the label to "Procedure/Counselling" from "Treatment given". We believe that the goal of this change is to replace the previous term with professional terminology. The rest three changes are all respondences to this change. Basically, what they do is to replace all the "Treatment" element_id with "Procedure". 
+
+3.	`indexEncounter.scala.html` – line 183:
+ This line is a corresponding change to the change under `treatmentTab.scala.html`. After the change, the `get` method is catching the object with element_id = "Procedure" instead of "Treatment"
+
+4.	`PDFController.java` -- line 401:
+ This line is also a corresponding change to the change under `treatmentTab.scala.html`. After the change, the `get` method is catching the object with element_id = "Procedure" instead of "Treatment"
+
+5.	`DatabaseSeeder.java` -- line 737 - 740:
+ This change is also the respondence to the change of `tretmentTab.scala.html`, it replaces "Treatment" with "Procedure".
+
+#### Justification
+To justify the change of `MedicationRepository.java`, we run the project again with before and after versions. And then we figure out that under the `Medical` module, we can assign medication that has strength missing to patients while there raises an exception in the before version. Then on teamfemr at Atlassian we find that this issue seems like `FEMR-252 Submitting medications causes exception`.
+
+To justify change of the rest four, we rerun the project with the before and after versions. And we find that the filed name of "Treatment given" has been changed to "Procedure" and both of them work properly. Then on teamfemr at Atlassian we know that this issue seems like `FEMR-185 Improve the "Treatment Given" field`.
+
+
+
+
+
 ## Part 2
 
 ### FEMR-208: encounter PDF not displaying amount of prescription dispensed
