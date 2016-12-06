@@ -1138,3 +1138,24 @@ Based on our analysis and criteria which are:
   
   
 In summary, change3 has the highest quality, then change2, and change1 has the lowest.
+
+## Part 3
+
+### RQ1. Time distribution in change request.
+
+Step | Average | Median
+---|---|---
+Concept Location|0.381 *|0.348 *					
+Impact Analysis|0.208|0.176
+Prefactoring|0.015|0.000
+Actualization|0.228|0.214
+Postfactoring|0.029|0.00
+Verification|0.139|0.128
+
+The result is a little bit surprising to us. Becase we were expecting either impact analysis or actualization costs most time among all the steps, but they didn't. The concept location costed most time. Besides, we didn't expect that the pre or post factoring takes so little time. Pre and post factoring are not important, but most of groups spent 0 minutes on them.
+
+We can try to explain these surprises:
+
+1. The project is not a tiny system so that locating the issue takes relatively more time.
+2. Developers are not familiar with the system. All developers in the research are students who has never touched FEMR, they need more time to get familiar with the system.
+3. Issues are small, and fixes are straight-forward. Which means prefactoring and postfactoring are not necessary.
