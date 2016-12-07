@@ -1162,9 +1162,14 @@ From this chart, we can see concept location costs most time in a change because
 
 And verification costs least because it can be done simply from front-end, or even by automatic testing.
 
+We also want to know the correlation of each possible pair. However, prefactoring and postfactoring are excluded from this analysis since they're usually optional part of the request log, including them might cause the analysis biased. Then we use R's cor and corrplot methods to visualize the correlation between each possible pair.
+
 ![](./Rplot.png)
 
 \* _Correlations of each time distribution pair_
+
+
+We find that all the correlations are positive, total time ~ concept location has the largest correlation which is 0.8. The coefficient indicates that the relationship of total time and concept location is nearly linear, we believe that it is caused because concept location usually take the heaviest weight of the total changing time. Also, verfication ~ actualization has a coefficient of 0.76, which is also indicating they're having a pretty strong linear relationship.
 
 ### RQ2. Average time spent on each class/method
 
@@ -1187,8 +1192,9 @@ We used RStudio’s lm (linear model) to do the regression and obtained the foll
 ![](Formula-method.bmp)
 ![](RegressionMethod.png)
 
-#### Time ~ number of methods data points distribution:
+#### Raw data points distribution
 ![](TimeVSNMethod.png)
+\* _Time ~ number of methods data points distribution_
 
 #### Conclusion:
 From the clean data, we can draw the conclusion that it takes around 15 minutes to change a class and it take around 11.3 minutes to change a method. And when we apply this modle to the raw data, we find out that the model fits logs that has more than 10 methods/class better than those has less than 10. But the overall performance is not very stable. The threat here is the limited number of request logs we have. 
@@ -1207,7 +1213,9 @@ Our research question 3 is to find out the relationship between conclusion quali
 
 Since different evaluator might have different standard when he or she's rating the log. So after the two graduate students finish their reading, we plot those rates and start the process to remove outlier. 
 
-Distribution of ratings from student blue and student red:![](Difference.png)
+![](Difference.png)
+
+\* _Distribution of ratings from student blue and student red_
 
 We have many different ways to determine the outliers:
 
