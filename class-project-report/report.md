@@ -21,7 +21,7 @@
 1.	`MedicationRepository.java` -- line 149 - 151:
  We used notepad++ on Windows to check the difference between those two files and realize there is only one section changed as a new if statement is added.
  
- After reading the code, we believe that the change is to fix an existed bug that may return `null` only when name is missing but not when medication strength or medication form is missing, which is considered as a possible case (or less restriction on medication data entry).
+ After reading the code, we believe that the change is to fix an existed bug that may return `null` only when name is missing but not when medication strength or medication form is missing, which is considered as a possible case (or less restriction on medication data entry). ![](medidiff.bmp)
 
 2.	`pharmacyClientValidation.js` under pharmacy folder -- line 6 - 11:
  We looked at both `pharmacyClientValidation.js` under pharmacy folders of before and after. And we notice that the only changed section is a condition statement about if a check box is checked or not. The contained string is about if the disclaimer has been read or not. 
@@ -35,7 +35,7 @@
 To justify our inference for the change of `MedicationRepository.java`, we run the 0_before and 1_after separately with Intelli J IDE. It shows that, under the Medical module, the after version supports to assign a new medication which has name only while the before version would prompt us that there is a run-time exception raised. Then on teamfemr at Atlassian we find that this issue seems like `FEMR-252 Submitting medications causes exception`.
 
 To justify the change of `pharmacyClientValidaition.js`, we run the before and after versions, and it proves our inference since the check box does appear in the after version under the Pharmacy module. Then on teamfemr at Atlassian we know that this issue seems like`FEMR-138 Don't let a user submit on Pharmacy unless they check the disclaimer`.
-
+![](parmacy_js.png)
 
 ### CC2
 
@@ -44,6 +44,7 @@ To justify the change of `pharmacyClientValidaition.js`, we run the before and a
 2.	We use the `diff` command with `–rp` as the parameter to compare 0_before and 1_after folder. Following is what we’ve got.
 
 ![](CC2command.bmp)
+
 
 3.	We figured out that there are 5 files changed after the change request. 
 4.	The name of changed files are: `MedicationRepository.java`, `PDFController.java`, `indexEncounter.scala.html`, `treatmentTab.scala.html` and `DatabaseSeeder.java`.
@@ -68,9 +69,6 @@ To justify the change of `pharmacyClientValidaition.js`, we run the before and a
 To justify the change of `MedicationRepository.java`, we run the project again with before and after versions. And then we figure out that under the `Medical` module, we can assign medication that has strength missing to patients while there raises an exception in the before version. Then on teamfemr at Atlassian we find that this issue seems like `FEMR-252 Submitting medications causes exception`.
 
 To justify change of the rest four, we rerun the project with the before and after versions. And we find that the filed name of "Treatment given" has been changed to "Procedure" and both of them work properly. Then on teamfemr at Atlassian we know that this issue seems like `FEMR-185 Improve the "Treatment Given" field`.
-
-
-
 
 
 ## Part 2
@@ -1159,3 +1157,68 @@ We can try to explain these surprises:
 1. The project is not a tiny system so that locating the issue takes relatively more time.
 2. Developers are not familiar with the system. All developers in the research are students who has never touched FEMR, they need more time to get familiar with the system.
 3. Issues are small, and fixes are straight-forward. Which means prefactoring and postfactoring are not necessary.
+
+### RQ2. Average time spent on each class/method
+
+In research question 1, we gathered the information of the timing and number of method/class changed per change. Before we use them to do research question 2, we would like to clear the data by following steps: 
+
+1.	For class/method ~ time relation research, we would like to remove sample instances that do not record the number of changed classes. Same process for method ~ time relationship research.
+2.	Then we calculate the average time for changing a class or method for each change, i.e. time/class or time/method metrics.
+3.	Then we used the box-plot to remove the outliers. 
+![](box-class.bmp)
+
+After the clear, we 29 records for class ~ time (5 no record, 1 outlier); 19 records for method ~ time (15 no record, 1 outlier)
+
+#### Class ~ time relationship:
+We used RStudio’s lm (linear model) to do the regression and obtained the following graph and regression model:
+![](Formula-class.bmp)
+![](RegressionClass.png)
+
+#### Method ~ time relationship:
+We used RStudio’s lm (linear model) to do the regression and obtained the following graph and regression model:
+![](Formula-method.bmp)
+![](RegressionMethod.png)
+
+#### Time ~ number of methods data points distribution:
+![](TimeVSNMethod.png)
+
+#### Conclusion:
+From the clean data, we can draw the conclusion that it takes around 15 minutes to change a class and it take around 11.3 minutes to change a method. And when we apply this modle to the raw data, we find out that the model fits logs that has more than 10 methods/class better than those has less than 10. But the overall performance is not very stable. The threat here is the limited number of request logs we have. 
+
+Also, before the research, we planned to determine if the marginal time for changing a method/class is increasing or decrease by checking if the scatter plot is concave up or down. However, due to the lack of instances, or it’s naturally to be this, we’re not able to find any clue about this question from this plot. 
+
+### RQ3. Coverage and log conclusion quality
+
+Our research question 3 is to find out the relationship between conclusion quality and its coverage to the whole request report.
+
+1. First, we let a group of two graduate students read and rate the `quality` of each of the 35 request log conclusions from 1(bad) to 5(good). Then we define the `coverage` of a log conclusion be the ratio of ![](DefOfCoverage.bmp)
+
+2. Then, we use box plot to eliminate those outliers.
+3. Next, we determine the correlation of coverage and quality (the rate). 
+4. Last but not least, we determine the regression model of coverage and quality to determine how much of the coverage is needed to meet the standard of a fair (rate = 3) request report.
+
+Since different evaluator might have different standard when he or she's rating the log. So after the two graduate students finish their reading, we plot those rates and start the process to remove outlier. 
+
+Distribution of ratings from student blue and student red:![](Difference.png)
+
+We have many different ways to determine the outliers:
+
+1. For each request report, if |rate of student 1 – rate of student 2| <=1, then we think the rate is justified, otherwise we would prefer to remove it from further discussion.
+2.	For each request report, if |(rate of student 1 +1) – rate of student 2| <=1, then we think the rate is justified, otherwise we would prefer to remove it from further discussion.
+3.	For each request report, if |rate of student 1 – (rate of student 2 + 1)| <=1, then we think the rate is justified, otherwise we would prefer to remove it from further discussion.
+
+Note: Theoretically, there should be more ways like |rate of student 1 – (rate of student 2 + 2)|, etc. But from the raw difference plot we noticed that most of the difference ranged from 1 to 2, so the addition of plus/minus 1 is enough.
+
+In order to have as many instances as possible, we would like to pick the way that returns largest sample pool. 1 returns 10 outliers, 2 returns 17, 3 returns 9. Thus way 3 is picked, and all the rates are curved to (rate of student 1 + (rate of student 2 +1))/2.
+
+After removing the outliers, we do the `coverage ~ rate` correlation and regression analysis.
+The correlation analysis returns that the correlation coefficient between coverage and rate is 0.6389. Thus they're positively related and more coverage indicates that the quality of conclusion is better.
+
+The regression model show that the `coverage ~ rate` follows the formula of Rate=2.062+7.979*Coverage.
+
+![](Part3Regression.png)
+
+#### Conclusion:
+The data are not very friendly to us thus the model gives at least 2.062 for each request since coverage is always positive. What we can conclude from the regression is that the coefficient for coverage is positive thus it is also an evidence to support what we have got in correlation analysis. In summary, the higher coverage, the better log conclusion.
+
+
