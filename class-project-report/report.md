@@ -1141,22 +1141,30 @@ In summary, change3 has the highest quality, then change2, and change1 has the l
 
 ### RQ1. Time distribution in change request.
 
-Step | Average | Median
+#### Dataset
+
+- Data was extracted from 35 change logs.
+- We deducted the pre-factoring and post-factoring time from the total time.
+- We calculated ratio of every step to total time. 
+
+#### Result
+
+Step | Average ️▾ | Median
 ---|---|---
-Concept Location|0.381 *|0.348 *					
-Impact Analysis|0.208|0.176
-Prefactoring|0.015|0.000
-Actualization|0.228|0.214
-Postfactoring|0.029|0.00
-Verification|0.139|0.128
+Concept Location | 0.385 | 0.377
+Actualization | 0.258 | 0.233
+Impact Analysis | 0.208 | 0.188
+Verification | 0.150 | 0.146
 
-The result is a little bit surprising to us. Becase we were expecting either impact analysis or actualization costs most time among all the steps, but they didn't. The concept location costed most time. Besides, we didn't expect that the pre or post factoring takes so little time. Pre and post factoring are not important, but most of groups spent 0 minutes on them.
+\* _Time ratio of every step to total time_
 
-We can try to explain these surprises:
+From this chart, we can see concept location costs most time in a change because developers have to visit many files, doing debug cross code and front-end.
 
-1. The project is not a tiny system so that locating the issue takes relatively more time.
-2. Developers are not familiar with the system. All developers in the research are students who has never touched FEMR, they need more time to get familiar with the system.
-3. Issues are small, and fixes are straight-forward. Which means prefactoring and postfactoring are not necessary.
+And verification costs least because it can be done simply from front-end, or even by automatic testing.
+
+![](./Rplot.png)
+
+\* _Correlations of each time distribution pair_
 
 ### RQ2. Average time spent on each class/method
 
